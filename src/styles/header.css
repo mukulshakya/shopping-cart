@@ -1,0 +1,21 @@
+@import url('https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@700&display=swap');
+
+#logo {
+  font-weight: bold;
+  font-size: 20px;
+  color: black;
+  font-family: 'Josefin Sans', sans-serif;
+  display: inline-block;
+}
+
+Header {
+  /* padding: 50%!important; */
+  display: flex;
+  /* grid-template-columns: 10% 80% 10%;*/
+  align-items: center; 
+  /* justify-items: center;  */
+  justify-content: space-evenly;
+  flex-wrap: wrap;
+  text-align: center;
+  border-bottom: 1px solid #ccc;
+}
