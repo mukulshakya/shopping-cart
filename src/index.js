@@ -4,6 +4,7 @@ import "./styles/index.css";
 import Home from "./pages/home";
 import Products from "./pages/products";
 import * as serviceWorker from "./serviceWorker";
+import "antd/dist/antd.css";
 import {
   BrowserRouter as Router,
   Switch,
