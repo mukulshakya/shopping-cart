@@ -1,15 +1,15 @@
 import React from "react";
 import "../styles/zoomingImage.css";
 
-function ZoomingImage() {
+function ZoomingImage({data}) {
   return (
     <div id="image-wrapper">
       <img
-        src="https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png"
-        alt="Category"
+        src={data.image}
+        alt={data.name || "Category"}
       />
       <div style={{ position: "relative" }} id="category-wrapper">
-        <span id="category">category</span>
+        <span id="category">{data.name || "category"}</span>
       </div>
     </div>
   );

@@ -1,0 +1,13 @@
+.dotStyle {
+  background: green;
+  color: red;
+}
+
+#image {
+  width: 240px;
+  height: 300px;
+  background-position: center;
+  background-size: contain;
+  background-repeat: no-repeat;
+  padding: 0 100px;
+}

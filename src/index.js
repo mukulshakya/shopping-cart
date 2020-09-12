@@ -3,6 +3,7 @@ import ReactDOM from "react-dom";
 import "./styles/index.css";
 import Home from "./pages/home";
 import Products from "./pages/products";
+import Cart from "./pages/cart";
 import * as serviceWorker from "./serviceWorker";
 import "antd/dist/antd.css";
 import {
@@ -12,6 +13,8 @@ import {
   Link,
   useLocation,
 } from "react-router-dom";
+
+import { RecoilRoot } from "recoil";
 
 function NoMatch() {
   let location = useLocation();
@@ -27,21 +30,26 @@ function NoMatch() {
 }
 
 ReactDOM.render(
-  <React.StrictMode>
-    <Router>
-      <Switch>
-        <Route exact path="/">
-          <Home />
-        </Route>
-        <Route path="/products">
-          <Products />
-        </Route>
-        <Route path="*">
-          <NoMatch />
-        </Route>
-      </Switch>
-    </Router>
-  </React.StrictMode>,
+  <RecoilRoot>
+    <React.StrictMode>
+      <Router>
+        <Switch>
+          <Route exact path="/">
+            <Home />
+          </Route>
+          <Route path="/products">
+            <Products />
+          </Route>
+          <Route path="/cart">
+            <Cart />
+          </Route>
+          <Route path="*">
+            <NoMatch />
+          </Route>
+        </Switch>
+      </Router>
+    </React.StrictMode>
+  </RecoilRoot>,
   document.getElementById("root")
 );
 

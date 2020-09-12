@@ -1,11 +1,15 @@
 const jwt = require("jsonwebtoken");
 const db = require("../models");
-const config = require("../config");
+const {
+  jwt: { secret },
+} = require("config");
 
 module.exports = async (req, res, next) => {
   try {
-    const token = req.header("Authorization").replace("Bearer ", "");
-    const decoded = jwt.verify(token, config.JWTSECRET);
+    const token = req.header("Authorization");
+    if (!token) return res.error({}, "Auth token missing");
+
+    const decoded = jwt.verify(token.replace("Bearer ", ""), secret);
     const user = await db.User.findById(decoded.id);
     if (!user) return res.error();
 

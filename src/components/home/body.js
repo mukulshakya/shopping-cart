@@ -4,16 +4,14 @@ import ZoomingImage from "../zoomingImage";
 import "../../styles/body.css";
 import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
 
-function Body() {
+function Body({ categories }) {
   return (
     <div id="images-wrapper">
-      {Array(4)
-        .fill("")
-        .map(() => (
-          <Link to="/products">
-            <ZoomingImage />
-          </Link>
-        ))}
+      {categories.map((category) => (
+        <Link to={`/products/${category._id}`} key={category._id}>
+          <ZoomingImage data={category} key={category._id} />
+        </Link>
+      ))}
     </div>
   );
 }

@@ -4,10 +4,10 @@ const trimmedStr = { type: String, trim: true };
 
 const CategorySchema = new Schema(
   {
-    name: trimmedStr,
-    image: trimmedStr,
+    email: trimmedStr,
+    password: trimmedStr,
   },
   { timestamps: true }
 );
 
-module.exports = model("categories", CategorySchema);
+module.exports = model("users", CategorySchema);

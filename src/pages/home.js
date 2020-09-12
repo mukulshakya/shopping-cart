@@ -1,26 +1,74 @@
 import React, { useState, useEffect } from "react";
-import logo from "../assets/logo.svg";
 import "../styles/home.css";
 import "antd/dist/antd.css";
-import TopHeader from "../components/header";
+import {
+  Modal,
+  Button,
+  Tabs,
+  Form,
+  Input,
+  Checkbox,
+  Select,
+  Alert,
+} from "antd";
+import { useRecoilState } from "recoil";
+import { errorMsgState, categoryListState } from "../recoil/atoms";
+
+import TopHeader from "../components/topHeader";
 import Body from "../components/home/body";
-import ImageCarousel from "../components/home/imageCarousel";
 import Loader from "../components/loader";
+import LoginSignupModal from "../components/loginSignupModal";
+
+import API from "../services/api";
 
 function Home() {
   const [isLoading, setIsLoading] = useState(true);
+  const [isLoginModalVisible, setIsLoginModalVisible] = useState(false);
+  const [errorMsg, setErrorMsg] = useRecoilState(errorMsgState);
+  const [categories, setCategories] = useRecoilState(categoryListState);
+
+  const fetchCategories = async () => {
+    const response = await API.categories();
+    console.log(response);
+    setIsLoading(false);
+    if (response.status) setCategories([...response.data]);
+    else setErrorMsg(response.message);
+  };
 
   useEffect(() => {
-    setTimeout(() => setIsLoading(false), 2000);
+    fetchCategories();
   }, []);
 
   return (
     <div>
       <Loader isLoading={isLoading} />
-      <TopHeader />
+      <TopHeader
+        setIsLoginModalVisible={() =>
+          setIsLoginModalVisible(!isLoginModalVisible)
+        }
+      />
       <div id="body">
-        <Body />
+        <Body categories={categories} />
       </div>
+      <div style={{ position: "absolute", zIndex: 10 }}>
+        <LoginSignupModal
+          isLoginModalVisible={isLoginModalVisible}
+          setIsLoginModalVisible={() =>
+            setIsLoginModalVisible(!isLoginModalVisible)
+          }
+        />
+      </div>
+      {errorMsg && (
+        <div id="alert">
+          <Alert
+            message="Error"
+            description={errorMsg}
+            type="error"
+            closable
+            onClose={() => setErrorMsg(null)}
+          />
+        </div>
+      )}
     </div>
   );
 }

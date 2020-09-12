@@ -9,6 +9,7 @@ const trimmedStr = { type: String, trim: true };
 const ProductSchema = new Schema(
   {
     name: trimmedStr,
+    images: [trimmedStr],
     categoryId: { type: ObjectId, ref: "categories" },
     actualPrice: Number,
     discountedPrice: Number,
@@ -16,6 +17,7 @@ const ProductSchema = new Schema(
     description: trimmedStr,
     views: { type: Number, default: 0 },
     stockCount: Number,
+    sizes: { type: [{ ...trimmedStr, uppercase: true }], default: [] },
   },
   { timestamps: true }
 );

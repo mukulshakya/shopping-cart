@@ -1,5 +1,5 @@
 module.exports = {
-  success: function (data, message = "Action completed successfully") {
+  success: function (data = {}, message = "Action completed successfully") {
     return this.status(200).json({ status: true, message, data });
   },
   error: function (errors = {}, message = "Unexpected error") {
@@ -15,7 +15,7 @@ module.exports = {
         : errors,
     });
   },
-  unAuth: function (errors, message = "Unable to authenticate.") {
+  unAuth: function (errors = {}, message = "Unable to authenticate") {
     return this.status(401).json({
       status: false,
       message,
