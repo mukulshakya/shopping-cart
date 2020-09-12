@@ -74,3 +74,9 @@ button.BrainhubCarousel__dot {
 .ant-modal-body {
   padding-top: 0 !important;
 }
+
+header.ant-layout-header {
+  height: auto !important;
+  /* padding: 0 !important; */
+}
+

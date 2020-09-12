@@ -1,26 +1,43 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import "antd/dist/antd.css";
 import "../styles/header.css";
-import { Layout, Input, Button, Badge } from "antd";
+import { Layout, Input, Button, Badge, Tooltip } from "antd";
 import {
   ShopOutlined,
   UserOutlined,
   ShoppingCartOutlined,
 } from "@ant-design/icons";
 import API from "../services/api";
-import { currentUserState } from "../recoil/atoms";
+import { currentUserState, cartListState } from "../recoil/atoms";
 import { useRecoilState } from "recoil";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 const { Header } = Layout;
 const { Search } = Input;
 
 function TopHeader({ setIsLoginModalVisible }) {
   const [currentUser, setCurrentUser] = useRecoilState(currentUserState);
+  const [cart, setCart] = useRecoilState(cartListState);
+  const [logoutLoading, setLogoutLoading] = useState(false);
+
+  const location = useLocation();
+  console.log({ location });
 
   const checkLogin = async () => {
-    const user = await API.profile();
-    user && setCurrentUser(user);
+    const response = await API.profile();
+    response.status && setCurrentUser({ ...response.data });
+    const cart = await API.getCart();
+    cart.status && setCart(cart.data);
+  };
+
+  const logout = async () => {
+    setLogoutLoading(true);
+    localStorage.removeItem("token");
+    setTimeout(() => {
+      setCurrentUser(null);
+      setLogoutLoading(false);
+      window.location = "/";
+    }, 1000);
   };
 
   useEffect(() => {
@@ -39,15 +56,35 @@ function TopHeader({ setIsLoginModalVisible }) {
       <Search
         style={{ width: "50%", "justify-content": "center", margin: "0 20px" }}
         placeholder="input search text"
-        onSearch={(value) => console.log(value)}
+        onSearch={(value) => {
+          console.log(value);
+          window.location = location.pathname.startsWith("/products")
+            ? `${location.pathname}?search=${value}`
+            : `/products?search=${value}`;
+        }}
         enterButton
       />
-      <Link to="/cart">
-        <Badge count={5}>
-          <ShoppingCartOutlined style={{ fontSize: "30px" }} />
-        </Badge>
-      </Link>
-      {!currentUser && (
+
+      {currentUser && (
+        <Link to="/cart">
+          <Badge count={cart.length}>
+            <ShoppingCartOutlined style={{ fontSize: "30px" }} />
+          </Badge>
+        </Link>
+      )}
+
+      {currentUser ? (
+        <Tooltip title={currentUser.email}>
+          <Button
+            icon={<UserOutlined />}
+            onClick={logout}
+            style={{ marginLeft: 3 }}
+            loading={logoutLoading}
+          >
+            LOGOUT
+          </Button>
+        </Tooltip>
+      ) : (
         <Button icon={<UserOutlined />} onClick={setIsLoginModalVisible}>
           LOGIN / SIGNUP
         </Button>

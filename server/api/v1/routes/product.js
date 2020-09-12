@@ -7,18 +7,14 @@ const {
   schemas: { cartSchema },
 } = require("../../../validations");
 
-router
-  .route("/products")
-  // .post(auth, validate({ body: bookSchema }), product.createBook)
-  .get(product.getAllProducts);
-// .put(auth, validate({ body: updateBookSchema }), product.updateAbook)
-// .delete(auth, validate({ query: validateObjectId }), product.deleteAbook);
+router.route("/products").get(product.getAllProducts);
 
 router.route("/categories").get(product.getAllCategories);
 
-// router
-//   .route("/cart")
-//   .post(validate({ body: cartSchema }), product.addToCart)
-//   .get(product.getCart);
+router
+  .route("/cart")
+  .post(auth, validate({ body: cartSchema }), product.addToCart)
+  .put(auth, validate({ body: cartSchema }), product.removeFromCart)
+  .get(auth, product.getCart);
 
 module.exports = router;

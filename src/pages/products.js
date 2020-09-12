@@ -45,10 +45,24 @@ function Products() {
   const location = useLocation();
 
   const fetchProducts = async () => {
-    const temp = location.pathname.split("/");
+    const { pathname, search } = location;
+    const temp = pathname.split("/");
     const categoryId = temp[temp.length - 1];
 
-    const response = await API.products({ categoryId });
+    const params = {};
+    temp.length > 2 && Object.assign(params, { categoryId });
+
+    search
+      .replace("?", "")
+      .split("&")
+      .forEach((param) => {
+        const [key, value] = param.split("=");
+        params[key] = value;
+      });
+
+    console.log({ search: search.replace("?").split("&"), params });
+
+    const response = await API.products(params);
 
     setIsLoading(false);
     if (response.status) {

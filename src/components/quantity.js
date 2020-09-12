@@ -1,15 +1,29 @@
 import React, { useState } from "react";
+import { errorMsgState } from "../recoil/atoms";
 import "../styles/quantity.css";
+import API from "../services/api";
 
-function Quantity({ quantity, stockCount }) {
+function Quantity({ quantity, stockCount, updateCart, productId }) {
   const [value, setValue] = useState(quantity || 1);
+  const [errMsg, setErrMsg] = useState(errorMsgState);
 
-  const increment = () => {
-    setValue(value < stockCount ? value + 1 : value);
+  const increment = async () => {
+    const updated = value < stockCount ? value + 1 : false;
+    if (updated) {
+      setValue(updated);
+      await API.addToCart({ productId, quantity: 1 });
+      await updateCart();
+    } else setErrMsg("Out of stock");
   };
 
-  const decrement = () => {
-    setValue(value > 1 ? value - 1 : value);
+  const decrement = async () => {
+    console.log(value)
+    const updated = value > 0 ? value - 1 : false;
+    if (updated) {
+      setValue(updated);
+      await API.removeFromCart({ productId, quantity: 1 });
+      await updateCart();
+    } else setErrMsg("Out of stock");
   };
 
   return (

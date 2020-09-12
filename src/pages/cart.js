@@ -13,7 +13,7 @@ import {
   InputNumber,
 } from "antd";
 import { useRecoilState } from "recoil";
-import { errorMsgState, categoryListState } from "../recoil/atoms";
+import { errorMsgState, cartListState } from "../recoil/atoms";
 import ProductDesc from "../components/product/productDesc";
 import Quantity from "../components/quantity";
 
@@ -22,62 +22,59 @@ import Body from "../components/home/body";
 import Loader from "../components/loader";
 import LoginSignupModal from "../components/loginSignupModal";
 import CartItem from "../components/cart/cartItem";
+import { CheckCircleTwoTone } from "@ant-design/icons";
 
 import API from "../services/api";
 
 function Cart() {
   const [isLoading, setIsLoading] = useState(true);
   const [isLoginModalVisible, setIsLoginModalVisible] = useState(false);
+  const [isSuccessModalVisible, setIsSuccessModalVisible] = useState(false);
+  const [placeOrderLoading, setPlaceOrderLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useRecoilState(errorMsgState);
-  const [categories, setCategories] = useRecoilState(categoryListState);
+  const [cart, setCart] = useRecoilState(cartListState);
 
   const deliveryDate = new Date();
   deliveryDate.setDate(deliveryDate.getDate() + 3);
 
-  const fetchCategories = async () => {
-    const response = await API.categories();
-    console.log(response);
+  const fetchCart = async () => {
+    setIsLoading(true);
+    const response = await API.getCart();
+    console.log("cart", response);
     setIsLoading(false);
-    if (response.status) setCategories([...response.data]);
+    if (response.status) setCart([...response.data]);
     else setErrorMsg(response.message);
   };
 
+  const placeOrder = async () => {
+    setPlaceOrderLoading(true);
+    setTimeout(() => {;
+      setPlaceOrderLoading(false);
+      setIsSuccessModalVisible(true);
+    }, 1000);
+  };
+
   useEffect(() => {
-    fetchCategories();
+    fetchCart();
   }, []);
 
-  const productDummy = {
-    actualPrice: 222999,
-    category: {
-      _id: "5f5c5cd36593643cb5d872ff",
-      name: "Appliances",
-      image: "https://i.imgur.com/LXcsMb7.jpg",
-    },
-    createdAt: "2020-09-12T05:29:55.932Z",
-    description:
-      "Samsung The Frame 163cm (65 inch) Ultra HD (4K) QLED Smart TV (QA65LS03TAKXXL)",
-    discountedPrice: 149999,
-    features: (5)[
-      ("Supported Apps: Netflix|Prime Video|Apple TV|Disney+Hotstar|Youtube",
-      "Operating System: Tizen",
-      "Resolution: Ultra HD (4K) 3840 x 2160 Pixels",
-      "Sound Output: 40 W",
-      "Refresh Rate: 120 Hz")
-    ],
-    images: (5)[
-      ("https://i.imgur.com/AzW1VNK.jpg",
-      "https://i.imgur.com/vM0fRzx.jpg",
-      "https://i.imgur.com/AzW1VNK.jpg",
-      "https://i.imgur.com/vM0fRzx.jpg",
-      "https://i.imgur.com/AzW1VNK.jpg")
-    ],
-    name: "SAMSUNG 65 inch 4k TV",
-    sizes: [],
-    stockCount: 39,
-    updatedAt: "2020-09-12T05:29:55.932Z",
-    views: 0,
-    _id: "5f5c5cd36593643cb5d873",
-  };
+  const calculateTotal = () =>
+    cart.reduce(
+      (a, b) => ({
+        total: a.total + b.quantity * b.product.discountedPrice,
+      }),
+      { total: 0 }
+    ).total;
+
+  const calculateSavings = () =>
+    cart.reduce(
+      (a, b) => ({
+        total:
+          a.total +
+          b.quantity * (b.product.actualPrice - b.product.discountedPrice),
+      }),
+      { total: 0 }
+    ).total;
 
   return (
     <div>
@@ -90,8 +87,6 @@ function Cart() {
       <div
         style={{
           margin: "10px 20%",
-          //   width: "70% !important",
-          //   display: "flex",
           display: "grid",
           gridTemplateColumns: "70% 30%",
           gridGap: 10,
@@ -99,13 +94,11 @@ function Cart() {
       >
         <div style={{ border: "1px solid #ccc" }}>
           <h3 style={{ borderBottom: "1px solid #ccc", paddingLeft: 10 }}>
-            My Cart ({12})
+            My Cart ({cart.length})
           </h3>
-          {Array(4)
-            .fill("")
-            .map((item) => (
-              <CartItem />
-            ))}
+          {cart.map((item) => (
+            <CartItem item={item} updateCart={fetchCart} />
+          ))}
         </div>
 
         <div style={{ border: "1px solid #ccc" }}>
@@ -121,8 +114,10 @@ function Cart() {
                 paddingBottom: 10,
               }}
             >
-              <span>Price ({2} items)</span>
-              <span style={{ textAlign: "right" }}>₹{5190}</span>
+              <span>
+                Price ({cart.length} {cart.length > 1 ? "items" : "item"})
+              </span>
+              <span style={{ textAlign: "right" }}>₹{calculateTotal()}</span>
             </div>
             <div
               style={{
@@ -133,24 +128,53 @@ function Cart() {
               }}
             >
               <span>Delivery Charges</span>
-              <span>FREE</span>
+              <span style={{ color: "green" }}>FREE</span>
             </div>
 
-            <div style={{ fontSize: 11, padding: "10px 0" }}>
-              You will save ₹{4000} on this order
+            <div style={{ fontSize: 11, padding: "10px 0" , textAlign: "center"}}>
+              You will save{" "}
+              <span style={{ color: "green" }}>₹{calculateSavings()}</span> on
+              this order
+            </div>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                marginBottom: 15,
+              }}
+            >
+              <Button
+                type="danger"
+                loading={placeOrderLoading}
+                onClick={placeOrder}
+              >
+                PLACE ORDER
+              </Button>
             </div>
           </div>
         </div>
       </div>
 
-      <div style={{ position: "absolute", zIndex: 10 }}>
-        <LoginSignupModal
-          isLoginModalVisible={isLoginModalVisible}
-          setIsLoginModalVisible={() =>
-            setIsLoginModalVisible(!isLoginModalVisible)
-          }
-        />
-      </div>
+      {/* <div id="wrapper"> */}
+      <Modal
+        // title="Modal 1000px width"
+        centered
+        visible={isSuccessModalVisible}
+        onOk={() => setIsSuccessModalVisible(false)}
+        onCancel={() => setIsSuccessModalVisible(false)}
+        footer={null}
+        // width={1000}
+      >
+        <div style={{ textAlign: "center", paddingTop: 24 }}>
+          <CheckCircleTwoTone
+            twoToneColor="#52c41a"
+            style={{ fontSize: 100, textAlign: "center" }}
+          />
+          <h3 style={{ marginTop: 20 }}>Order Placed Successfully</h3>
+        </div>
+      </Modal>
+      {/* </div> */}
+
       {errorMsg && (
         <div id="alert">
           <Alert

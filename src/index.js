@@ -6,12 +6,14 @@ import Products from "./pages/products";
 import Cart from "./pages/cart";
 import * as serviceWorker from "./serviceWorker";
 import "antd/dist/antd.css";
+import API from "./services/api";
 import {
   BrowserRouter as Router,
   Switch,
   Route,
   Link,
   useLocation,
+  Redirect,
 } from "react-router-dom";
 
 import { RecoilRoot } from "recoil";

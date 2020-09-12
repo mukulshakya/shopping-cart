@@ -27,6 +27,8 @@ function ProductDesc({ product }) {
                 fontSize: 10,
                 color: "green",
                 fontWeight: "bold",
+                display: "inline-block",
+                marginRight: 10,
               }}
             >
               {Math.round(
@@ -38,6 +40,7 @@ function ProductDesc({ product }) {
             </span>
           </span>
         )}
+        <span>({product.stockCount} Left)</span>
       </div>
     </div>
   );

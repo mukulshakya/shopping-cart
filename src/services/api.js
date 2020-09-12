@@ -26,7 +26,7 @@ const parseError = (error) =>
 
 func.register = async (payload) => {
   try {
-    // console.log({ payload });
+    console.log("register", { payload });
     const res = await api.post("/register", payload);
     console.log({ res });
     return res;
@@ -37,7 +37,7 @@ func.register = async (payload) => {
 
 func.login = async (payload) => {
   try {
-    console.log({ payload });
+    console.log("login", { payload });
     const res = await api.post("/login", payload);
     console.log(res.data);
     return res.data;
@@ -67,6 +67,36 @@ func.products = async (params) => {
 func.categories = async () => {
   try {
     const res = await api.get("/categories");
+    return res.data;
+  } catch (error) {
+    return parseError(error);
+  }
+};
+
+func.addToCart = async (payload) => {
+  try {
+    payload.quantity = payload.quantity || 1;
+    const res = await api.post("/cart", payload);
+    return res.data;
+  } catch (error) {
+    return parseError(error);
+  }
+};
+
+func.removeFromCart = async (payload) => {
+  try {
+    console.log(payload)
+    payload.quantity = payload.quantity || 1;
+    const res = await api.put("/cart", payload);
+    return res.data;
+  } catch (error) {
+    return parseError(error);
+  }
+};
+
+func.getCart = async () => {
+  try {
+    const res = await api.get("/cart");
     return res.data;
   } catch (error) {
     return parseError(error);

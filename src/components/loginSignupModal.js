@@ -3,7 +3,11 @@ import "../styles/loader.css";
 import API from "../services/api";
 import AlertMessage from "./alertMessage";
 import { useRecoilState } from "recoil";
-import { errorMsgState } from "../recoil/atoms";
+import {
+  currentUserState,
+  errorMsgState,
+  cartListState,
+} from "../recoil/atoms";
 import { LoadingOutlined } from "@ant-design/icons";
 import {
   Modal,
@@ -20,15 +24,32 @@ const { TabPane } = Tabs;
 const layout = { labelCol: { span: 8 }, wrapperCol: { span: 16 } };
 const tailLayout = { wrapperCol: { offset: 8, span: 16 } };
 
-function LoginForm() {
+function LoginForm({ currentTab, setIsLoginModalVisible }) {
+  console.log(currentTab);
   const [errorMsg, setErrorMsg] = useRecoilState(errorMsgState);
+  const [currentUser, setCurrentUser] = useRecoilState(currentUserState);
   const [isLoading, setIsLoading] = useState(false);
+  const [cart, setCart] = useRecoilState(cartListState);
 
   const onFinish = async (values) => {
     setIsLoading(true);
-    console.log("Success:", values);
-    const response = await API.login(values);
-    !response.status && setErrorMsg(response.message);
+    let response = {};
+    if (currentTab == 2) response = await API.register(values);
+    else response = await API.login(values);
+
+    console.log(response);
+
+    if (response.status) {
+      localStorage.setItem("token", response.data.token);
+      setCurrentUser({ ...response.data.user });
+      setIsLoginModalVisible();
+
+      const cart = await API.getCart();
+      cart.status && setCart(cart.data);
+    } else {
+      setErrorMsg(response.message);
+      setTimeout(() => setErrorMsg(null), 2000);
+    }
     setIsLoading(false);
   };
 
@@ -102,7 +123,10 @@ function LoginSignupModal({ isLoginModalVisible, setIsLoginModalVisible }) {
         <Tabs defaultActiveKey="1" onChange={(key) => setCurrentTab(key)}>
           {["Login", "Sign Up", "Admin Login"].map((name, index) => (
             <TabPane tab={name} key={index + 1}>
-              <LoginForm currentTab={currentTab} />
+              <LoginForm
+                currentTab={currentTab}
+                setIsLoginModalVisible={setIsLoginModalVisible}
+              />
             </TabPane>
           ))}
         </Tabs>
