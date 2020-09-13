@@ -3,7 +3,7 @@ import "../styles/product.css";
 import "antd/dist/antd.css";
 import TopHeader from "../components/topHeader";
 import Loader from "../components/loader";
-import { useLocation } from "react-router-dom";
+import { useLocation, useHistory } from "react-router-dom";
 import API from "../services/api";
 import { useRecoilState } from "recoil";
 import { errorMsgState, productListState } from "../recoil/atoms";
@@ -12,7 +12,7 @@ import "@brainhubeu/react-carousel/lib/style.css";
 import LoginSignupModal from "../components/loginSignupModal";
 import ProductModal from "../components/product/productModal";
 import ProductDesc from "../components/product/productDesc";
-import { Alert, Card, Menu, Dropdown } from "antd";
+import { Alert, Card, Menu, Dropdown, Button } from "antd";
 import { DownOutlined, LoadingOutlined } from "@ant-design/icons";
 const { Meta } = Card;
 
@@ -32,6 +32,7 @@ function Products() {
   };
 
   const location = useLocation();
+  const history = useHistory();
 
   useEffect(() => {
     fetchProducts();
@@ -67,6 +68,15 @@ function Products() {
     }
   };
 
+  const getSearch = () =>
+    location.search
+      ? location.search
+          .replace("?", "")
+          .split("&")
+          .filter((key) => key.startsWith("search"))[0]
+          .split("=")[1]
+      : "";
+
   const handleMenuClick = (e) => {
     setSelectedSort(e.key);
     fetchProducts({ sort: e.item.props.value });
@@ -84,10 +94,39 @@ function Products() {
         <div
           style={{
             display: "flex",
-            flexDirection: "row-reverse",
+            flexDirection: "row",
+            justifyContent: "space-between",
             padding: "0 20px 10px 0",
           }}
         >
+          <div>
+            <h4>
+              {location.search ? (
+                <span>
+                  <span>Search results for </span>
+                  <span
+                    style={{
+                      fontWeight: "bold",
+                      display: "inline-block",
+                      marginRight: 15,
+                    }}
+                  >
+                    {getSearch()}
+                  </span>
+                  <Button
+                    type="dashed"
+                    size="small"
+                    onClick={() => (window.location = "/products")}
+                  >
+                    Clear
+                  </Button>
+                </span>
+              ) : (
+                ""
+              )}
+            </h4>
+          </div>
+
           <Dropdown
             overlay={
               <Menu onClick={handleMenuClick}>
