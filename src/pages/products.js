@@ -20,6 +20,7 @@ import Carousel, { autoplayPlugin, Dots } from "@brainhubeu/react-carousel";
 import "@brainhubeu/react-carousel/lib/style.css";
 import LoginSignupModal from "../components/loginSignupModal";
 import ProductModal from "../components/product/productModal";
+import ProductDesc from "../components/product/productDesc";
 import {
   Modal,
   Button,
@@ -60,8 +61,6 @@ function Products() {
         params[key] = value;
       });
 
-    console.log({ search: search.replace("?").split("&"), params });
-
     const response = await API.products(params);
 
     setIsLoading(false);
@@ -70,7 +69,10 @@ function Products() {
       const values = {};
       response.data.forEach((e, i) => (values[i] = 0));
       setValues({ ...values });
-    } else setErrorMsg(response.message);
+    } else {
+      setErrorMsg(response.message);
+      setTimeout(() => setErrorMsg(null), 2000);
+    }
   };
 
   useEffect(() => {
@@ -127,12 +129,17 @@ function Products() {
                 number={product.images.length}
               />
             </div>
+            <div style={{textAlign: "center"}}>
+              {/* <h3>{product.name}</h3> */}
+              <ProductDesc product={product} />
+            </div>
+
             <Meta
               onClick={(e) => {
                 setIsProductModalVisible(true);
                 setCurrentProduct(product);
               }}
-              title={product.name}
+              // title={product.name}
               description={product.description}
               style={{
                 // position: "relative",

@@ -20,6 +20,7 @@ import Loader from "../components/loader";
 import LoginSignupModal from "../components/loginSignupModal";
 
 import API from "../services/api";
+import { Link } from "react-router-dom";
 
 function Home() {
   const [isLoading, setIsLoading] = useState(true);
@@ -32,7 +33,10 @@ function Home() {
     console.log(response);
     setIsLoading(false);
     if (response.status) setCategories([...response.data]);
-    else setErrorMsg(response.message);
+    else {
+      setErrorMsg(response.message);
+      setTimeout(() => setErrorMsg(null), 2000);
+    }
   };
 
   useEffect(() => {
@@ -48,6 +52,19 @@ function Home() {
         }
       />
       <div id="body">
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "row-reverse",
+            margin: "10px 0",
+          }}
+        >
+          <Link to="/products">
+            <Button type="primary" size="medium">
+              View All
+            </Button>
+          </Link>
+        </div>
         <Body categories={categories} />
       </div>
       <div style={{ position: "absolute", zIndex: 10 }}>

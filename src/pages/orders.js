@@ -11,6 +11,7 @@ import {
   Select,
   Alert,
   InputNumber,
+  Collapse,
 } from "antd";
 import { useRecoilState } from "recoil";
 import { errorMsgState, cartListState } from "../recoil/atoms";
@@ -27,7 +28,7 @@ import { CheckCircleTwoTone } from "@ant-design/icons";
 import { useHistory } from "react-router-dom";
 
 import API from "../services/api";
-
+const { Panel } = Collapse;
 function Cart() {
   const [isLoading, setIsLoading] = useState(true);
   const [isLoginModalVisible, setIsLoginModalVisible] = useState(false);
@@ -100,6 +101,16 @@ function Cart() {
       { total: 0 }
     ).total;
 
+  function callback(key) {
+    console.log(key);
+  }
+
+  const text = `
+        A dog is a type of domesticated animal.
+        Known for its loyalty and faithfulness,
+        it can be found as a welcome guest in many households across the world.
+      `;
+
   return (
     <div>
       <Loader isLoading={isLoading} />
@@ -111,76 +122,23 @@ function Cart() {
       <div
         style={{
           margin: "10px 20%",
-          display: "grid",
-          gridTemplateColumns: "70% 30%",
-          gridGap: 10,
+          //   display: "grid",
+          //   gridTemplateColumns: "70% 30%",
+          //   gridGap: 10,
         }}
       >
-        <div style={{ border: "1px solid #ccc" }}>
-          <h3 style={{ borderBottom: "1px solid #ccc", paddingLeft: 10 }}>
-            My Cart ({cart.length})
-          </h3>
-          {cart.map((item) => (
-            <CartItem item={item} updateCart={fetchCart} />
-          ))}
-        </div>
-
-        <div style={{ border: "1px solid #ccc" }}>
-          <h3 style={{ borderBottom: "1px solid #ccc", paddingLeft: 10 }}>
-            Price Details
-          </h3>
-
-          <div style={{ margin: "0 10px" }}>
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                paddingBottom: 10,
-              }}
-            >
-              <span>
-                Price ({cart.length} {cart.length > 1 ? "items" : "item"})
-              </span>
-              <span style={{ textAlign: "right" }}>₹{calculateTotal()}</span>
-            </div>
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                paddingBottom: 10,
-                borderBottom: "1px dashed #ccc",
-              }}
-            >
-              <span>Delivery Charges</span>
-              <span style={{ color: "green" }}>FREE</span>
-            </div>
-
-            <div
-              style={{ fontSize: 11, padding: "10px 0", textAlign: "center" }}
-            >
-              You will save{" "}
-              <span style={{ color: "green" }}>₹{calculateSavings()}</span> on
-              this order
-            </div>
-            {!!cart.length && (
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "center",
-                  marginBottom: 15,
-                }}
-              >
-                <Button
-                  type="danger"
-                  loading={placeOrderLoading}
-                  onClick={placeOrder}
-                >
-                  PLACE ORDER
-                </Button>
-              </div>
-            )}
-          </div>
-        </div>
+        <h2>My Orders</h2>
+        <Collapse defaultActiveKey={["1"]} onChange={callback}>
+          <Panel header="This is panel header 1" key="1">
+            <p>{text}</p>
+          </Panel>
+          <Panel header="This is panel header 2" key="2">
+            <p>{text}</p>
+          </Panel>
+          <Panel header="This is panel header 3" key="3" disabled>
+            <p>{text}</p>
+          </Panel>
+        </Collapse>
       </div>
 
       {/* <div id="wrapper"> */}

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import ProductDesc from "../product/productDesc";
 import Quantity from "../quantity";
 import { Button } from "antd";
@@ -6,15 +6,19 @@ import { CloseOutlined } from "@ant-design/icons";
 import API from "../../services/api";
 
 function CartItem({ item, updateCart }) {
+  const [removeFromCartLoading, setRemoveFromCartLoading] = useState(false);
+
   const deliveryDate = new Date();
   deliveryDate.setDate(deliveryDate.getDate() + 3);
 
   const removeFromCart = async () => {
+    setRemoveFromCartLoading(true);
     const response = await API.removeFromCart({
       productId: item.productId,
       quantity: item.quantity,
     });
     response.status && updateCart();
+    setRemoveFromCartLoading(false);
   };
 
   return (
@@ -65,7 +69,7 @@ function CartItem({ item, updateCart }) {
             shape="circle"
             icon={<CloseOutlined />}
             size="small"
-            loading={false}
+            loading={removeFromCartLoading}
             onClick={removeFromCart}
           />
         </div>

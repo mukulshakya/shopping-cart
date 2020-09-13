@@ -1,7 +1,13 @@
 import axios from "axios";
-// import constants from "../constants";
 
-const api = axios.create({ baseURL: "http://localhost:4040/v1" });
+const url = {
+  LIVE: "https://heeko-ecommerce-api.herokuapp.com/v1",
+  LOCAL: "http://localhost:4040/v1",
+};
+// process.env.NODE_ENV === "production" ? URL.LIVE : URL.LOCAL
+const api = axios.create({
+  baseURL: url.LIVE,
+});
 
 api.interceptors.request.use(
   async function (config) {
@@ -85,7 +91,7 @@ func.addToCart = async (payload) => {
 
 func.removeFromCart = async (payload) => {
   try {
-    console.log(payload)
+    console.log(payload);
     payload.quantity = payload.quantity || 1;
     const res = await api.put("/cart", payload);
     return res.data;
@@ -97,6 +103,15 @@ func.removeFromCart = async (payload) => {
 func.getCart = async () => {
   try {
     const res = await api.get("/cart");
+    return res.data;
+  } catch (error) {
+    return parseError(error);
+  }
+};
+
+func.placeOrder = async (payload) => {
+  try {
+    const res = await api.post("/order", payload);
     return res.data;
   } catch (error) {
     return parseError(error);

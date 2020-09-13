@@ -13,11 +13,14 @@ function Quantity({ quantity, stockCount, updateCart, productId }) {
       setValue(updated);
       await API.addToCart({ productId, quantity: 1 });
       await updateCart();
-    } else setErrMsg("Out of stock");
+    } else {
+      setErrMsg("Out of stock");
+      setTimeout(() => setErrMsg(null), 2000);
+    }
   };
 
   const decrement = async () => {
-    console.log(value)
+    console.log(value);
     const updated = value > 0 ? value - 1 : false;
     if (updated) {
       setValue(updated);

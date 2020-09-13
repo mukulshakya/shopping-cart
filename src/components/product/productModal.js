@@ -1,8 +1,13 @@
 import React, { useState } from "react";
 import API from "../../services/api";
 import AlertMessage from "../alertMessage";
-import { useRecoilState } from "recoil";
-import { errorMsgState, cartListState } from "../../recoil/atoms";
+import { useRecoilState, useRecoilValue } from "recoil";
+import {
+  errorMsgState,
+  cartListState,
+  currentUserState,
+  productListState,
+} from "../../recoil/atoms";
 import { LoadingOutlined } from "@ant-design/icons";
 import Carousel, { autoplayPlugin, Dots } from "@brainhubeu/react-carousel";
 import "@brainhubeu/react-carousel/lib/style.css";
@@ -14,6 +19,7 @@ import {
   Link,
   useLocation,
   Redirect,
+  useHistory,
 } from "react-router-dom";
 import {
   Modal,
@@ -41,25 +47,35 @@ function ProductModal({
   const [addToCartLoading, setAddToCartLoading] = useState(false);
   const [buyNowLoading, setBuyNowLoading] = useState(false);
   const [cart, setCart] = useRecoilState(cartListState);
+  const [errorMsg, setErrorMsg] = useRecoilState(errorMsgState);
+  const [products, setProducts] = useRecoilState(productListState);
+  const currentUser = useRecoilValue(currentUserState);
 
-  console.log(product);
+  const history = useHistory();
+
+  // console.log(product);
 
   const addToCart = async (type) => {
+    if (!currentUser)
+      return (
+        setErrorMsg("You need to login first"),
+        setTimeout(() => setErrorMsg(null), 2000)
+      );
+
     if (type === "buy") setBuyNowLoading(true);
     else setAddToCartLoading(true);
 
-    setTimeout(async () => {
-      const response = await API.addToCart({
-        productId: product._id,
-        quantity: 1,
-      });
-      console.log("res - ", response);
-      const cart = await API.getCart();
-      cart.status && setCart(cart.data);
-      setAddToCartLoading(false);
-      setBuyNowLoading(false);
-      if (type === "buy") window.location = "/cart";
-    }, 1000);
+    const response = await API.addToCart({
+      productId: product._id,
+      quantity: 1,
+    });
+    console.log("res - ", response);
+    const cart = await API.getCart();
+    cart.status && setCart(cart.data);
+
+    setAddToCartLoading(false);
+    setBuyNowLoading(false);
+    type === "buy" && history.push("/cart");
   };
 
   const isOnCart = () => {

@@ -4,6 +4,7 @@ import "./styles/index.css";
 import Home from "./pages/home";
 import Products from "./pages/products";
 import Cart from "./pages/cart";
+import Orders from "./pages/orders";
 import * as serviceWorker from "./serviceWorker";
 import "antd/dist/antd.css";
 import API from "./services/api";
@@ -44,6 +45,9 @@ ReactDOM.render(
           </Route>
           <Route path="/cart">
             <Cart />
+          </Route>
+          <Route path="/orders">
+            <Orders />
           </Route>
           <Route path="*">
             <NoMatch />

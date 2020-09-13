@@ -6,11 +6,12 @@ import {
   ShopOutlined,
   UserOutlined,
   ShoppingCartOutlined,
+  ShoppingOutlined,
 } from "@ant-design/icons";
 import API from "../services/api";
 import { currentUserState, cartListState } from "../recoil/atoms";
 import { useRecoilState } from "recoil";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useHistory } from "react-router-dom";
 
 const { Header } = Layout;
 const { Search } = Input;
@@ -21,6 +22,7 @@ function TopHeader({ setIsLoginModalVisible }) {
   const [logoutLoading, setLogoutLoading] = useState(false);
 
   const location = useLocation();
+  const history = useHistory();
   console.log({ location });
 
   const checkLogin = async () => {
@@ -36,7 +38,7 @@ function TopHeader({ setIsLoginModalVisible }) {
     setTimeout(() => {
       setCurrentUser(null);
       setLogoutLoading(false);
-      window.location = "/";
+      history.push("/");
     }, 1000);
   };
 
@@ -68,8 +70,22 @@ function TopHeader({ setIsLoginModalVisible }) {
       {currentUser && (
         <Link to="/cart">
           <Badge count={cart.length}>
-            <ShoppingCartOutlined style={{ fontSize: "30px" }} />
+            <Tooltip title="Cart">
+              <ShoppingCartOutlined
+                style={{ fontSize: "30px", lineHeight: "100%" }}
+              />
+            </Tooltip>
           </Badge>
+        </Link>
+      )}
+
+      {currentUser && (
+        <Link to="/orders">
+          <Tooltip title="Orders">
+            <ShoppingOutlined
+              style={{ fontSize: "30px", lineHeight: "100%" }}
+            />
+          </Tooltip>
         </Link>
       )}
 
