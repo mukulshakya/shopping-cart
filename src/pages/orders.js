@@ -104,15 +104,18 @@ function Cart() {
                       padding: 0,
                     }}
                   ></div>
-                  <h3
-                    style={{ alignSelf: "center", cursor: "default" }}
-                    onClick={() => {
-                      setCurrentProduct(product);
-                      setIsProductModalVisible(true);
-                    }}
-                  >
-                    {product.name}
-                  </h3>
+                  <div style={{ alignSelf: "center" }}>
+                    <h3
+                      style={{ cursor: "default" }}
+                      onClick={() => {
+                        setCurrentProduct(product);
+                        setIsProductModalVisible(true);
+                      }}
+                    >
+                      {product.name}
+                    </h3>
+                    <h4>Quantity - {quantity}</h4>
+                  </div>
                   <h3 style={{ alignSelf: "center" }}>
                     ₹{product.discountedPrice}
                   </h3>
