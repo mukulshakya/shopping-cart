@@ -12,7 +12,8 @@ import "@brainhubeu/react-carousel/lib/style.css";
 import LoginSignupModal from "../components/loginSignupModal";
 import ProductModal from "../components/product/productModal";
 import ProductDesc from "../components/product/productDesc";
-import { Alert, Card } from "antd";
+import { Alert, Card, Menu, Dropdown } from "antd";
+import { DownOutlined, LoadingOutlined } from "@ant-design/icons";
 const { Meta } = Card;
 
 function Products() {
@@ -23,6 +24,12 @@ function Products() {
   const [errorMsg, setErrorMsg] = useRecoilState(errorMsgState);
   const [products, setProducts] = useRecoilState(productListState);
   const [values, setValues] = useState({});
+  const [selectedSort, setSelectedSort] = useState(0);
+  const sorts = {
+    newest: "Newest",
+    "p-lth": "Price Low to High",
+    "p-htl": "Price High to Low",
+  };
 
   const location = useLocation();
 
@@ -30,12 +37,12 @@ function Products() {
     fetchProducts();
   }, []);
 
-  const fetchProducts = async () => {
+  const fetchProducts = async (params = {}) => {
+    setIsLoading(true);
     const { pathname, search } = location;
     const temp = pathname.split("/");
     const categoryId = temp[temp.length - 1];
 
-    const params = {};
     temp.length > 2 && Object.assign(params, { categoryId });
 
     search
@@ -60,6 +67,11 @@ function Products() {
     }
   };
 
+  const handleMenuClick = (e) => {
+    setSelectedSort(e.key);
+    fetchProducts({ sort: e.item.props.value });
+  };
+
   return (
     <div>
       <Loader isLoading={isLoading} />
@@ -68,64 +80,100 @@ function Products() {
           setIsLoginModalVisible(!isLoginModalVisible)
         }
       />
-      <div
-        id="body"
-        style={{
-          display: "flex",
-          flexWrap: "wrap",
-          justifyContent: "space-evenly",
-        }}
-      >
-        {products.map((product, index) => (
-          <Card
-            hoverable
-            style={{
-              width: 240,
-              marginBottom: 20,
-            }}
-            productId={product._id}
+      <div id="body">
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "row-reverse",
+            padding: "0 20px 10px 0",
+          }}
+        >
+          <Dropdown
+            overlay={
+              <Menu onClick={handleMenuClick}>
+                {Object.entries(sorts).map(([key, value], index) => (
+                  <Menu.Item key={index} value={key}>
+                    <span
+                      style={{ color: index == selectedSort ? "red" : "black" }}
+                    >
+                      {value}
+                    </span>
+                  </Menu.Item>
+                ))}
+              </Menu>
+            }
           >
-            <div style={{ padding: 10 }}>
-              <Carousel
-                value={values[index]}
-                slides={[
-                  ...product.images.map((image) => (
-                    <div
-                      onClick={(e) => {
-                        setIsProductModalVisible(true);
-                        setCurrentProduct(product);
-                      }}
-                      id="image"
-                      style={{
-                        backgroundImage: `url(${image})`,
-                      }}
-                    ></div>
-                  )),
-                ]}
-                onChange={(value) => setValues({ ...values, [index]: value })}
-              />
-              <Dots
-                value={values[index]}
-                onChange={(value) => setValues({ ...values, [index]: value })}
-                number={product.images.length}
-              />
-            </div>
-            <div style={{ textAlign: "center" }}>
-              {/* <h3>{product.name}</h3> */}
-              <ProductDesc product={product} />
-            </div>
+            <span>
+              <span>Sort By </span>
+              <span>
+                {isLoading && products.length ? (
+                  <LoadingOutlined />
+                ) : (
+                  <DownOutlined />
+                )}
+              </span>
+            </span>
+          </Dropdown>
+        </div>
 
-            <Meta
-              onClick={(e) => {
-                setIsProductModalVisible(true);
-                setCurrentProduct(product);
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            justifyContent: "space-evenly",
+          }}
+        >
+          {products.map((product, index) => (
+            <Card
+              hoverable
+              style={{
+                width: 240,
+                marginBottom: 20,
               }}
-              description={product.description}
-              style={{ textAlign: "center", padding: 10, fontSize: 12 }}
-            />
-          </Card>
-        ))}
+              productId={product._id}
+            >
+              <div style={{ padding: 10 }}>
+                <Carousel
+                  value={values[index]}
+                  slides={[
+                    ...product.images.map((image) => (
+                      <div
+                        onClick={(e) => {
+                          setIsProductModalVisible(true);
+                          setCurrentProduct(product);
+                        }}
+                        id="image"
+                        style={{
+                          backgroundImage: `url(${image})`,
+                        }}
+                      ></div>
+                    )),
+                  ]}
+                  onChange={(value) => setValues({ ...values, [index]: value })}
+                />
+                <Dots
+                  value={values[index]}
+                  onChange={(value) => setValues({ ...values, [index]: value })}
+                  number={product.images.length}
+                />
+              </div>
+              <div style={{ textAlign: "center" }}>
+                <ProductDesc product={product} />
+              </div>
+
+              <Meta
+                onClick={(e) => {
+                  setIsProductModalVisible(true);
+                  setCurrentProduct(product);
+                }}
+                description={product.description}
+                style={{ textAlign: "center", padding: 10, fontSize: 12 }}
+              />
+            </Card>
+          ))}
+        </div>
       </div>
+
       <div style={{ position: "absolute", zIndex: 10 }}>
         <LoginSignupModal
           isLoginModalVisible={isLoginModalVisible}
