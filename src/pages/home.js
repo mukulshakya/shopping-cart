@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import "../styles/home.css";
 import "antd/dist/antd.css";
 import { Button, Alert } from "antd";
-import { useRecoilState } from "recoil";
+import { useRecoilState, useResetRecoilState } from "recoil";
 import { errorMsgState, categoryListState } from "../recoil/atoms";
 
 import TopHeader from "../components/topHeader";
@@ -18,6 +18,13 @@ function Home() {
   const [isLoginModalVisible, setIsLoginModalVisible] = useState(false);
   const [errorMsg, setErrorMsg] = useRecoilState(errorMsgState);
   const [categories, setCategories] = useRecoilState(categoryListState);
+  const resetCategories = useResetRecoilState(categoryListState);
+
+  useEffect(() => {
+    fetchCategories();
+
+    return () => resetCategories();
+  }, []);
 
   const fetchCategories = async () => {
     const response = await API.categories();
@@ -28,10 +35,6 @@ function Home() {
       setTimeout(() => setErrorMsg(null), 2000);
     }
   };
-
-  useEffect(() => {
-    fetchCategories();
-  }, []);
 
   return (
     <div>

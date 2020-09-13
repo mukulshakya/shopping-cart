@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import "../styles/home.css";
 import "antd/dist/antd.css";
 import { Modal, Alert, Collapse } from "antd";
-import { useRecoilState } from "recoil";
+import { useRecoilState, useResetRecoilState } from "recoil";
 import { errorMsgState, orderListState } from "../recoil/atoms";
 import ProductModal from "../components/product/productModal";
 
@@ -23,6 +23,7 @@ function Cart() {
   const [currentProduct, setCurrentProduct] = useState(null);
   const [errorMsg, setErrorMsg] = useRecoilState(errorMsgState);
   const [orders, setOrders] = useRecoilState(orderListState);
+  const resetOrders = useResetRecoilState(orderListState);
 
   const history = useHistory();
 
@@ -31,6 +32,8 @@ function Cart() {
 
   useEffect(() => {
     fetchOrders();
+
+    return () => resetOrders();
   }, []);
 
   const fetchOrders = async () => {

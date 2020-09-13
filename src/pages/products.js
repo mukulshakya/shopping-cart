@@ -5,7 +5,7 @@ import TopHeader from "../components/topHeader";
 import Loader from "../components/loader";
 import { useLocation, useHistory } from "react-router-dom";
 import API from "../services/api";
-import { useRecoilState } from "recoil";
+import { useRecoilState, useResetRecoilState } from "recoil";
 import { errorMsgState, productListState } from "../recoil/atoms";
 import Carousel, { Dots } from "@brainhubeu/react-carousel";
 import "@brainhubeu/react-carousel/lib/style.css";
@@ -30,12 +30,15 @@ function Products() {
     "p-lth": "Price Low to High",
     "p-htl": "Price High to Low",
   };
+  const resetProducts = useResetRecoilState(productListState);
 
   const location = useLocation();
   const history = useHistory();
 
   useEffect(() => {
     fetchProducts();
+
+    return () => resetProducts();
   }, []);
 
   const fetchProducts = async (params = {}) => {
