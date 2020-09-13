@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { errorMsgState } from "../recoil/atoms";
-import "../styles/quantity.css";
 import { Button } from "antd";
 import { PlusOutlined, MinusOutlined } from "@ant-design/icons";
 import API from "../services/api";
