@@ -1,0 +1,3 @@
+[submodule "heeko-assignment-server"]
+	path = heeko-assignment-server
+	url = https://github.com/mukulshakya/heeko-assignment-server.git
