@@ -8,7 +8,6 @@ function AlertMessage() {
       description="Error Description Error Description Error Description Error Description Error Description Error Description"
       type="error"
       closable
-      // onClose={onClose}
     />
   );
 }

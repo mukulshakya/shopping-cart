@@ -6,7 +6,7 @@ import {
   ShopOutlined,
   UserOutlined,
   ShoppingCartOutlined,
-  ShoppingOutlined,
+  HistoryOutlined,
 } from "@ant-design/icons";
 import API from "../services/api";
 import { currentUserState, cartListState } from "../recoil/atoms";
@@ -23,7 +23,10 @@ function TopHeader({ setIsLoginModalVisible }) {
 
   const location = useLocation();
   const history = useHistory();
-  console.log({ location });
+
+  useEffect(() => {
+    checkLogin();
+  }, []);
 
   const checkLogin = async () => {
     const response = await API.profile();
@@ -42,11 +45,6 @@ function TopHeader({ setIsLoginModalVisible }) {
     }, 1000);
   };
 
-  useEffect(() => {
-    console.log("header");
-    checkLogin();
-  }, []);
-
   return (
     <Header style={{ background: "white", padding: "0 20%", fontSize: "25px" }}>
       <Link to="/">
@@ -59,7 +57,6 @@ function TopHeader({ setIsLoginModalVisible }) {
         style={{ width: "50%", "justify-content": "center", margin: "0 20px" }}
         placeholder="input search text"
         onSearch={(value) => {
-          console.log(value);
           window.location = location.pathname.startsWith("/products")
             ? `${location.pathname}?search=${value}`
             : `/products?search=${value}`;
@@ -82,9 +79,7 @@ function TopHeader({ setIsLoginModalVisible }) {
       {currentUser && (
         <Link to="/orders">
           <Tooltip title="Orders">
-            <ShoppingOutlined
-              style={{ fontSize: "30px", lineHeight: "100%" }}
-            />
+            <HistoryOutlined style={{ fontSize: "28px", lineHeight: "100%" }} />
           </Tooltip>
         </Link>
       )}

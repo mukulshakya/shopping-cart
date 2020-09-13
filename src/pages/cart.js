@@ -1,24 +1,12 @@
 import React, { useState, useEffect } from "react";
 import "../styles/home.css";
 import "antd/dist/antd.css";
-import {
-  Modal,
-  Button,
-  Tabs,
-  Form,
-  Input,
-  Checkbox,
-  Select,
-  Alert,
-  InputNumber,
-} from "antd";
+import { Modal, Button, Alert } from "antd";
 import { useRecoilState } from "recoil";
 import { errorMsgState, cartListState } from "../recoil/atoms";
-import ProductDesc from "../components/product/productDesc";
-import Quantity from "../components/quantity";
+import ProductModal from "../components/product/productModal";
 
 import TopHeader from "../components/topHeader";
-import Body from "../components/home/body";
 import Loader from "../components/loader";
 import LoginSignupModal from "../components/loginSignupModal";
 import CartItem from "../components/cart/cartItem";
@@ -33,6 +21,8 @@ function Cart() {
   const [isLoginModalVisible, setIsLoginModalVisible] = useState(false);
   const [isSuccessModalVisible, setIsSuccessModalVisible] = useState(false);
   const [placeOrderLoading, setPlaceOrderLoading] = useState(false);
+  const [isProductModalVisible, setIsProductModalVisible] = useState(false);
+  const [currentProduct, setCurrentProduct] = useState(null);
   const [errorMsg, setErrorMsg] = useRecoilState(errorMsgState);
   const [cart, setCart] = useRecoilState(cartListState);
 
@@ -41,10 +31,13 @@ function Cart() {
   const deliveryDate = new Date();
   deliveryDate.setDate(deliveryDate.getDate() + 3);
 
+  useEffect(() => {
+    fetchCart();
+  }, []);
+
   const fetchCart = async () => {
     setIsLoading(true);
     const response = await API.getCart();
-    console.log("cart", response);
     setIsLoading(false);
     if (response.status) setCart([...response.data]);
     else {
@@ -77,10 +70,6 @@ function Cart() {
     setIsSuccessModalVisible(false);
     return history.push("/");
   };
-
-  useEffect(() => {
-    fetchCart();
-  }, []);
 
   const calculateTotal = () =>
     cart.reduce(
@@ -121,7 +110,12 @@ function Cart() {
             My Cart ({cart.length})
           </h3>
           {cart.map((item) => (
-            <CartItem item={item} updateCart={fetchCart} />
+            <CartItem
+              item={item}
+              updateCart={fetchCart}
+              setCurrentProduct={(product) => setCurrentProduct(product)}
+              setIsProductModalVisible={() => setIsProductModalVisible(true)}
+            />
           ))}
         </div>
 
@@ -208,6 +202,13 @@ function Cart() {
           isLoginModalVisible={isLoginModalVisible}
           setIsLoginModalVisible={() =>
             setIsLoginModalVisible(!isLoginModalVisible)
+          }
+        />
+        <ProductModal
+          product={currentProduct}
+          isProductModalVisible={isProductModalVisible}
+          setIsProductModalVisible={() =>
+            setIsProductModalVisible(!isProductModalVisible)
           }
         />
       </div>

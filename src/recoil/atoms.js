@@ -24,3 +24,8 @@ export const cartListState = atom({
   key: "cartListState",
   default: [],
 });
+
+export const orderListState = atom({
+  key: "orderListState",
+  default: [],
+});

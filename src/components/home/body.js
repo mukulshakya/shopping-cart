@@ -2,7 +2,7 @@ import React from "react";
 import "antd/dist/antd.css";
 import ZoomingImage from "../zoomingImage";
 import "../../styles/body.css";
-import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 function Body({ categories }) {
   return (

@@ -5,7 +5,12 @@ import { Button } from "antd";
 import { CloseOutlined } from "@ant-design/icons";
 import API from "../../services/api";
 
-function CartItem({ item, updateCart }) {
+function CartItem({
+  item,
+  updateCart,
+  setCurrentProduct,
+  setIsProductModalVisible,
+}) {
   const [removeFromCartLoading, setRemoveFromCartLoading] = useState(false);
 
   const deliveryDate = new Date();
@@ -31,6 +36,10 @@ function CartItem({ item, updateCart }) {
     >
       <div>
         <div
+          onClick={() => {
+            setCurrentProduct(item.product);
+            setIsProductModalVisible(true);
+          }}
           id="image"
           style={{
             backgroundImage: `url(${
@@ -58,7 +67,12 @@ function CartItem({ item, updateCart }) {
           width: "100%",
         }}
       >
-        <div>
+        <div
+          onClick={() => {
+            setCurrentProduct(item.product);
+            setIsProductModalVisible(true);
+          }}
+        >
           <ProductDesc product={item.product} />
         </div>
         <div style={{ fontSize: 11 }}>

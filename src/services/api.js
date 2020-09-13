@@ -32,9 +32,7 @@ const parseError = (error) =>
 
 func.register = async (payload) => {
   try {
-    console.log("register", { payload });
     const res = await api.post("/register", payload);
-    console.log({ res });
     return res;
   } catch (error) {
     return parseError(error);
@@ -43,9 +41,7 @@ func.register = async (payload) => {
 
 func.login = async (payload) => {
   try {
-    console.log("login", { payload });
     const res = await api.post("/login", payload);
-    console.log(res.data);
     return res.data;
   } catch (error) {
     return parseError(error);
@@ -91,7 +87,6 @@ func.addToCart = async (payload) => {
 
 func.removeFromCart = async (payload) => {
   try {
-    console.log(payload);
     payload.quantity = payload.quantity || 1;
     const res = await api.put("/cart", payload);
     return res.data;
@@ -112,6 +107,15 @@ func.getCart = async () => {
 func.placeOrder = async (payload) => {
   try {
     const res = await api.post("/order", payload);
+    return res.data;
+  } catch (error) {
+    return parseError(error);
+  }
+};
+
+func.getMyOrders = async (payload) => {
+  try {
+    const res = await api.get("/order");
     return res.data;
   } catch (error) {
     return parseError(error);

@@ -1,16 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "../styles/home.css";
 import "antd/dist/antd.css";
-import {
-  Modal,
-  Button,
-  Tabs,
-  Form,
-  Input,
-  Checkbox,
-  Select,
-  Alert,
-} from "antd";
+import { Button, Alert } from "antd";
 import { useRecoilState } from "recoil";
 import { errorMsgState, categoryListState } from "../recoil/atoms";
 
@@ -30,7 +21,6 @@ function Home() {
 
   const fetchCategories = async () => {
     const response = await API.categories();
-    console.log(response);
     setIsLoading(false);
     if (response.status) setCategories([...response.data]);
     else {

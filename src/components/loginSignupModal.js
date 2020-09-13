@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import "../styles/loader.css";
 import API from "../services/api";
-import AlertMessage from "./alertMessage";
 import { useRecoilState } from "recoil";
 import {
   currentUserState,
@@ -15,9 +14,6 @@ import {
   Tabs,
   Form,
   Input,
-  Checkbox,
-  Select,
-  Alert,
 } from "antd";
 const { TabPane } = Tabs;
 
@@ -25,7 +21,6 @@ const layout = { labelCol: { span: 8 }, wrapperCol: { span: 16 } };
 const tailLayout = { wrapperCol: { offset: 8, span: 16 } };
 
 function LoginForm({ currentTab, setIsLoginModalVisible }) {
-  console.log(currentTab);
   const [errorMsg, setErrorMsg] = useRecoilState(errorMsgState);
   const [currentUser, setCurrentUser] = useRecoilState(currentUserState);
   const [isLoading, setIsLoading] = useState(false);
@@ -36,8 +31,6 @@ function LoginForm({ currentTab, setIsLoginModalVisible }) {
     let response = {};
     if (currentTab == 2) response = await API.register(values);
     else response = await API.login(values);
-
-    console.log(response);
 
     if (response.status) {
       localStorage.setItem("token", response.data.token);
@@ -53,10 +46,6 @@ function LoginForm({ currentTab, setIsLoginModalVisible }) {
     setIsLoading(false);
   };
 
-  const onFinishFailed = (errorInfo) => {
-    console.log("Failed:", errorInfo);
-  };
-
   return (
     <Form
       {...layout}
@@ -65,7 +54,6 @@ function LoginForm({ currentTab, setIsLoginModalVisible }) {
         remember: true,
       }}
       onFinish={onFinish}
-      onFinishFailed={onFinishFailed}
     >
       <Form.Item
         label="Email"
@@ -112,13 +100,11 @@ function LoginSignupModal({ isLoginModalVisible, setIsLoginModalVisible }) {
   return (
     <div id="wrapper">
       <Modal
-        // title="Modal 1000px width"
         centered
         visible={isLoginModalVisible}
         onOk={setIsLoginModalVisible}
         onCancel={setIsLoginModalVisible}
         footer={null}
-        // width={1000}
       >
         <Tabs defaultActiveKey="1" onChange={(key) => setCurrentTab(key)}>
           {["Login", "Sign Up", "Admin Login"].map((name, index) => (

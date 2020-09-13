@@ -1,42 +1,16 @@
 import React, { useState } from "react";
 import API from "../../services/api";
-import AlertMessage from "../alertMessage";
 import { useRecoilState, useRecoilValue } from "recoil";
 import {
   errorMsgState,
   cartListState,
   currentUserState,
-  productListState,
 } from "../../recoil/atoms";
-import { LoadingOutlined } from "@ant-design/icons";
-import Carousel, { autoplayPlugin, Dots } from "@brainhubeu/react-carousel";
+import Carousel, { Dots } from "@brainhubeu/react-carousel";
 import "@brainhubeu/react-carousel/lib/style.css";
 import ProductDesc from "./productDesc";
-import {
-  BrowserRouter as Router,
-  Switch,
-  Route,
-  Link,
-  useLocation,
-  Redirect,
-  useHistory,
-} from "react-router-dom";
-import {
-  Modal,
-  Button,
-  Tabs,
-  Form,
-  Input,
-  Checkbox,
-  Select,
-  Alert,
-} from "antd";
-const { TabPane } = Tabs;
-
-const layout = { labelCol: { span: 8 }, wrapperCol: { span: 16 } };
-const tailLayout = { wrapperCol: { offset: 8, span: 16 } };
-
-const imageStyle = {};
+import { Link, useHistory } from "react-router-dom";
+import { Modal, Button } from "antd";
 
 function ProductModal({
   product,
@@ -48,12 +22,9 @@ function ProductModal({
   const [buyNowLoading, setBuyNowLoading] = useState(false);
   const [cart, setCart] = useRecoilState(cartListState);
   const [errorMsg, setErrorMsg] = useRecoilState(errorMsgState);
-  const [products, setProducts] = useRecoilState(productListState);
   const currentUser = useRecoilValue(currentUserState);
 
   const history = useHistory();
-
-  // console.log(product);
 
   const addToCart = async (type) => {
     if (!currentUser)
@@ -65,11 +36,7 @@ function ProductModal({
     if (type === "buy") setBuyNowLoading(true);
     else setAddToCartLoading(true);
 
-    const response = await API.addToCart({
-      productId: product._id,
-      quantity: 1,
-    });
-    console.log("res - ", response);
+    await API.addToCart({ productId: product._id, quantity: 1 });
     const cart = await API.getCart();
     cart.status && setCart(cart.data);
 
@@ -80,7 +47,6 @@ function ProductModal({
 
   const isOnCart = () => {
     const index = cart.findIndex((item) => item.productId === product._id);
-    console.log({ index });
     return index === -1 ? false : true;
   };
 

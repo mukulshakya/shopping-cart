@@ -8,11 +8,8 @@
 }
 
 Header {
-  /* padding: 50%!important; */
   display: flex;
-  /* grid-template-columns: 10% 80% 10%;*/
   align-items: center; 
-  /* justify-items: center;  */
   justify-content: space-evenly;
   flex-wrap: wrap;
   text-align: center;

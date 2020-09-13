@@ -5,7 +5,6 @@
   font-family: "Montserrat", sans-serif;
   margin: 0;
   padding: 0;
-  /* pointer-events: none; */
 }
 
 body {
@@ -47,11 +46,6 @@ code {
   padding: 0 !important;
 }
 
-/* .BrainhubCarousel__dots {
-  position: relative;
-  bottom: 30px;
-} */
-
 .BrainhubCarousel__dots .BrainhubCarousel__dot:before {
   width: 8px !important;
   height: 8px !important;
@@ -66,7 +60,6 @@ button.BrainhubCarousel__dot {
   background: none !important;
 }
 
-/* .BrainhubCarousel__thumbnail.BrainhubCarousel__thumbnail--selected */
 .BrainhubCarousel__thumbnail {
   padding: 5px !important;
 }
@@ -77,6 +70,8 @@ button.BrainhubCarousel__dot {
 
 header.ant-layout-header {
   height: auto !important;
-  /* padding: 0 !important; */
 }
 
+.ant-collapse-content > .ant-collapse-content-box {
+  padding: 0 !important;
+}

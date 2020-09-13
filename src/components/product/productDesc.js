@@ -3,7 +3,7 @@ import React from "react";
 function ProductDesc({ product }) {
   return (
     <div>
-      <h3>{product.name}</h3>
+      <h3 style={{ cursor: "default" }}>{product.name}</h3>
       <div>
         <span style={{ fontWeight: "bold" }}>
           ₹{product.discountedPrice}

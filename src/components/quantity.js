@@ -1,55 +1,66 @@
 import React, { useState } from "react";
 import { errorMsgState } from "../recoil/atoms";
 import "../styles/quantity.css";
+import { Button } from "antd";
+import { PlusOutlined, MinusOutlined } from "@ant-design/icons";
 import API from "../services/api";
 
 function Quantity({ quantity, stockCount, updateCart, productId }) {
   const [value, setValue] = useState(quantity || 1);
   const [errMsg, setErrMsg] = useState(errorMsgState);
+  const [incLoading, setIncLoading] = useState(false);
+  const [decLoading, setDecLoading] = useState(false);
 
   const increment = async () => {
-    const updated = value < stockCount ? value + 1 : false;
+    setIncLoading(true);
+    const updated = stockCount > 0 ? value + 1 : false;
     if (updated) {
-      setValue(updated);
       await API.addToCart({ productId, quantity: 1 });
       await updateCart();
+      setValue(updated);
     } else {
       setErrMsg("Out of stock");
       setTimeout(() => setErrMsg(null), 2000);
     }
+    setIncLoading(false);
   };
 
   const decrement = async () => {
-    console.log(value);
-    const updated = value > 0 ? value - 1 : false;
+    setDecLoading(true);
+    const updated = value > 1 ? value - 1 : false;
     if (updated) {
-      setValue(updated);
       await API.removeFromCart({ productId, quantity: 1 });
       await updateCart();
-    } else setErrMsg("Out of stock");
+      setValue(updated);
+    } else {
+      setErrMsg("Out of stock");
+      setTimeout(() => setErrMsg(null), 2000);
+    }
+    setDecLoading(false);
   };
 
   return (
-    <div className="quantity-input">
-      <button
-        className="quantity-input__modifier quantity-input__modifier--left"
+    <div
+      style={{
+        display: "grid",
+        gridTemplateColumns: "1fr 1fr 1fr",
+      }}
+    >
+      <Button
+        type="primary"
+        icon={<MinusOutlined />}
+        size="small"
+        loading={decLoading}
         onClick={decrement}
-      >
-        &mdash;
-      </button>
-      <input
-        className="quantity-input__screen"
-        type="text"
-        value={value}
-        readonly
-        style={{ pointerEvents: "none" }}
       />
-      <button
-        className="quantity-input__modifier quantity-input__modifier--right"
+      <div style={{ textAlign: "center", padding: 2 }}>{value}</div>
+      <Button
+        type="primary"
+        icon={<PlusOutlined />}
+        size="small"
+        loading={incLoading}
         onClick={increment}
-      >
-        &#xff0b;
-      </button>
+      />
     </div>
   );
 }

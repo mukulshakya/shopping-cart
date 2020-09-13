@@ -1,37 +1,18 @@
 import React, { useState, useEffect } from "react";
-import logo from "../assets/logo.svg";
 import "../styles/product.css";
 import "antd/dist/antd.css";
 import TopHeader from "../components/topHeader";
-import Body from "../components/home/body";
-import ImageCarousel from "../components/home/imageCarousel";
 import Loader from "../components/loader";
-import {
-  BrowserRouter as Router,
-  Switch,
-  Route,
-  Link,
-  useLocation,
-} from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import API from "../services/api";
 import { useRecoilState } from "recoil";
 import { errorMsgState, productListState } from "../recoil/atoms";
-import Carousel, { autoplayPlugin, Dots } from "@brainhubeu/react-carousel";
+import Carousel, { Dots } from "@brainhubeu/react-carousel";
 import "@brainhubeu/react-carousel/lib/style.css";
 import LoginSignupModal from "../components/loginSignupModal";
 import ProductModal from "../components/product/productModal";
 import ProductDesc from "../components/product/productDesc";
-import {
-  Modal,
-  Button,
-  Tabs,
-  Form,
-  Input,
-  Checkbox,
-  Select,
-  Alert,
-  Card,
-} from "antd";
+import { Alert, Card } from "antd";
 const { Meta } = Card;
 
 function Products() {
@@ -44,6 +25,10 @@ function Products() {
   const [values, setValues] = useState({});
 
   const location = useLocation();
+
+  useEffect(() => {
+    fetchProducts();
+  }, []);
 
   const fetchProducts = async () => {
     const { pathname, search } = location;
@@ -74,10 +59,6 @@ function Products() {
       setTimeout(() => setErrorMsg(null), 2000);
     }
   };
-
-  useEffect(() => {
-    fetchProducts();
-  }, []);
 
   return (
     <div>
@@ -129,7 +110,7 @@ function Products() {
                 number={product.images.length}
               />
             </div>
-            <div style={{textAlign: "center"}}>
+            <div style={{ textAlign: "center" }}>
               {/* <h3>{product.name}</h3> */}
               <ProductDesc product={product} />
             </div>
@@ -139,17 +120,8 @@ function Products() {
                 setIsProductModalVisible(true);
                 setCurrentProduct(product);
               }}
-              // title={product.name}
               description={product.description}
-              style={{
-                // position: "relative",
-                // bottom: 0,
-                // width: "100%",
-                textAlign: "center",
-                // flexGrow: 1,
-                padding: 10,
-                fontSize: 12,
-              }}
+              style={{ textAlign: "center", padding: 10, fontSize: 12 }}
             />
           </Card>
         ))}

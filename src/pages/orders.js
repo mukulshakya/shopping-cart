@@ -1,29 +1,15 @@
 import React, { useState, useEffect } from "react";
 import "../styles/home.css";
 import "antd/dist/antd.css";
-import {
-  Modal,
-  Button,
-  Tabs,
-  Form,
-  Input,
-  Checkbox,
-  Select,
-  Alert,
-  InputNumber,
-  Collapse,
-} from "antd";
+import { Modal, Alert, Collapse } from "antd";
 import { useRecoilState } from "recoil";
-import { errorMsgState, cartListState } from "../recoil/atoms";
-import ProductDesc from "../components/product/productDesc";
-import Quantity from "../components/quantity";
+import { errorMsgState, orderListState } from "../recoil/atoms";
+import ProductModal from "../components/product/productModal";
 
 import TopHeader from "../components/topHeader";
-import Body from "../components/home/body";
 import Loader from "../components/loader";
 import LoginSignupModal from "../components/loginSignupModal";
-import CartItem from "../components/cart/cartItem";
-import { CheckCircleTwoTone } from "@ant-design/icons";
+import { CheckCircleTwoTone, HomeOutlined } from "@ant-design/icons";
 
 import { useHistory } from "react-router-dom";
 
@@ -33,83 +19,45 @@ function Cart() {
   const [isLoading, setIsLoading] = useState(true);
   const [isLoginModalVisible, setIsLoginModalVisible] = useState(false);
   const [isSuccessModalVisible, setIsSuccessModalVisible] = useState(false);
-  const [placeOrderLoading, setPlaceOrderLoading] = useState(false);
+  const [isProductModalVisible, setIsProductModalVisible] = useState(false);
+  const [currentProduct, setCurrentProduct] = useState(null);
   const [errorMsg, setErrorMsg] = useRecoilState(errorMsgState);
-  const [cart, setCart] = useRecoilState(cartListState);
+  const [orders, setOrders] = useRecoilState(orderListState);
 
   const history = useHistory();
 
   const deliveryDate = new Date();
   deliveryDate.setDate(deliveryDate.getDate() + 3);
 
-  const fetchCart = async () => {
+  useEffect(() => {
+    fetchOrders();
+  }, []);
+
+  const fetchOrders = async () => {
     setIsLoading(true);
-    const response = await API.getCart();
-    console.log("cart", response);
+    const response = await API.getMyOrders();
     setIsLoading(false);
-    if (response.status) setCart([...response.data]);
+    if (response.status) setOrders([...response.data]);
     else {
       setErrorMsg(response.message);
       setTimeout(() => setErrorMsg(null), 2000);
     }
   };
 
-  const placeOrder = async () => {
-    setPlaceOrderLoading(true);
-    const payload = {
-      products: cart.map(({ productId, quantity }) => ({
-        productId,
-        quantity,
-      })),
-    };
+  const calcDeliveryDate = (order) => {
+    const deliveryDate = new Date(order.createdAt);
+    deliveryDate.setDate(deliveryDate.getDate() + 3);
 
-    const response = await API.placeOrder({ ...payload });
-    setPlaceOrderLoading(false);
-    if (response.status) {
-      setIsSuccessModalVisible(true);
-      await fetchCart();
-    } else {
-      setErrorMsg(response.message);
-      setTimeout(() => setErrorMsg(null), 2000);
-    }
+    return (
+      (deliveryDate > new Date() ? "To be delivered by " : "Delivered on ") +
+      deliveryDate.toDateString()
+    );
   };
 
   const hideSuccessModal = () => {
     setIsSuccessModalVisible(false);
     return history.push("/");
   };
-
-  useEffect(() => {
-    fetchCart();
-  }, []);
-
-  const calculateTotal = () =>
-    cart.reduce(
-      (a, b) => ({
-        total: a.total + b.quantity * b.product.discountedPrice,
-      }),
-      { total: 0 }
-    ).total;
-
-  const calculateSavings = () =>
-    cart.reduce(
-      (a, b) => ({
-        total:
-          a.total +
-          b.quantity * (b.product.actualPrice - b.product.discountedPrice),
-      }),
-      { total: 0 }
-    ).total;
-
-  function callback(key) {
-    console.log(key);
-  }
-
-  const text = `
-        A dog is a type of domesticated animal.
-        Known for its loyalty and faithfulness,
-        it can be found as a welcome guest in many households across the world.
-      `;
 
   return (
     <div>
@@ -119,37 +67,71 @@ function Cart() {
           setIsLoginModalVisible(!isLoginModalVisible)
         }
       />
-      <div
-        style={{
-          margin: "10px 20%",
-          //   display: "grid",
-          //   gridTemplateColumns: "70% 30%",
-          //   gridGap: 10,
-        }}
-      >
+      <div style={{ margin: "10px 20%" }}>
         <h2>My Orders</h2>
-        <Collapse defaultActiveKey={["1"]} onChange={callback}>
-          <Panel header="This is panel header 1" key="1">
-            <p>{text}</p>
-          </Panel>
-          <Panel header="This is panel header 2" key="2">
-            <p>{text}</p>
-          </Panel>
-          <Panel header="This is panel header 3" key="3" disabled>
-            <p>{text}</p>
-          </Panel>
+        <Collapse>
+          {orders.map((order) => (
+            <Panel
+              header={"Order No : " + order._id}
+              key={order._id}
+              extra={
+                <div>
+                  <HomeOutlined style={{ color: "#52c41a" }} />
+                  <span> {calcDeliveryDate(order)}</span>
+                </div>
+              }
+            >
+              {order.products.map(({ product, quantity }) => (
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "10% 50% 20% 20%",
+                    borderBottom: "1px solid #ccc",
+                    padding: "0 10px",
+                  }}
+                >
+                  <div
+                    onClick={() => {
+                      setCurrentProduct(product);
+                      setIsProductModalVisible(true);
+                    }}
+                    id="image"
+                    style={{
+                      backgroundImage: `url(${product?.images[0] || ""})`,
+                      height: 100,
+                      width: 60,
+                      backgroundPosition: "left",
+                      padding: 0,
+                    }}
+                  ></div>
+                  <h3
+                    style={{ alignSelf: "center", cursor: "default" }}
+                    onClick={() => {
+                      setCurrentProduct(product);
+                      setIsProductModalVisible(true);
+                    }}
+                  >
+                    {product.name}
+                  </h3>
+                  <h3 style={{ alignSelf: "center" }}>
+                    ₹{product.discountedPrice}
+                  </h3>
+                  <h4 style={{ alignSelf: "center" }}>
+                    {calcDeliveryDate(order)}
+                  </h4>
+                </div>
+              ))}
+            </Panel>
+          ))}
         </Collapse>
       </div>
 
-      {/* <div id="wrapper"> */}
       <Modal
-        // title="Modal 1000px width"
         centered
         visible={isSuccessModalVisible}
         onOk={hideSuccessModal}
         onCancel={hideSuccessModal}
         footer={null}
-        // width={1000}
       >
         <div style={{ textAlign: "center", paddingTop: 24 }}>
           <CheckCircleTwoTone
@@ -159,13 +141,19 @@ function Cart() {
           <h3 style={{ marginTop: 20 }}>Order Placed Successfully</h3>
         </div>
       </Modal>
-      {/* </div> */}
 
       <div style={{ position: "absolute", zIndex: 10 }}>
         <LoginSignupModal
           isLoginModalVisible={isLoginModalVisible}
           setIsLoginModalVisible={() =>
             setIsLoginModalVisible(!isLoginModalVisible)
+          }
+        />
+        <ProductModal
+          product={currentProduct}
+          isProductModalVisible={isProductModalVisible}
+          setIsProductModalVisible={() =>
+            setIsProductModalVisible(!isProductModalVisible)
           }
         />
       </div>

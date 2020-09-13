@@ -7,21 +7,17 @@ import Cart from "./pages/cart";
 import Orders from "./pages/orders";
 import * as serviceWorker from "./serviceWorker";
 import "antd/dist/antd.css";
-import API from "./services/api";
 import {
   BrowserRouter as Router,
   Switch,
   Route,
-  Link,
   useLocation,
-  Redirect,
 } from "react-router-dom";
 
 import { RecoilRoot } from "recoil";
 
 function NoMatch() {
-  let location = useLocation();
-  console.log(new URLSearchParams(location.search));
+  const location = useLocation();
 
   return (
     <div>

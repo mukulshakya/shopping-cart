@@ -22,7 +22,6 @@
 }
 
 .quantity-input__modifier {
-  /* padding: 0rem; */
   width: 20px;
   font-size: 12px;
   background: #f3f3f3;
@@ -45,7 +44,6 @@
 
 .quantity-input__screen {
   width: 30px;
-  /* padding: 0.7rem; */
   font-size: 12px;
   border: 0;
   border-top: 0 solid #dbdbdb;
