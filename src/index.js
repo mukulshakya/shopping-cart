@@ -31,7 +31,7 @@ function NoMatch() {
 ReactDOM.render(
   <RecoilRoot>
     <React.StrictMode>
-      <Router>
+      <Router basename="/shopping-cart">
         <Switch>
           <Route exact path="/">
             <Home />
