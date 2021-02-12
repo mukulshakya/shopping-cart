@@ -1,0 +1,3 @@
+[submodule "shopping-cart-server"]
+	path = shopping-cart-server
+	url = https://github.com/mukulshakya/shopping-cart-server.git
