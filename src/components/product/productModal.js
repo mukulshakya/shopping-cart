@@ -1,16 +1,20 @@
 import React, { useState } from "react";
-import API from "../../services/api";
-import { useRecoilState, useRecoilValue } from "recoil";
-import {
-  errorMsgState,
-  cartListState,
-  currentUserState,
-} from "../../recoil/atoms";
+// import API from "../../services/api";
+// import { useRecoilState, useRecoilValue } from "recoil";
+// import {
+//   errorMsgState,
+//   cartListState,
+//   currentUserState,
+// } from "../../recoil/atoms";
 import Carousel, { Dots } from "@brainhubeu/react-carousel";
 import "@brainhubeu/react-carousel/lib/style.css";
 import ProductDesc from "./productDesc";
 import { Link, useHistory } from "react-router-dom";
 import { Modal, Button } from "antd";
+import { useDispatch, useSelector } from "react-redux";
+import ErrorMsgRedux from "../../redux/reducers/errorMsg.reducer";
+import CartRedux from "../../redux/reducers/cart.reducer"
+
 
 function ProductModal({
   product,
@@ -20,25 +24,34 @@ function ProductModal({
   const [value, setValue] = useState(0);
   const [addToCartLoading, setAddToCartLoading] = useState(false);
   const [buyNowLoading, setBuyNowLoading] = useState(false);
-  const [cart, setCart] = useRecoilState(cartListState);
-  const [errorMsg, setErrorMsg] = useRecoilState(errorMsgState);
-  const currentUser = useRecoilValue(currentUserState);
+
+  const {
+    cart: { data: cart },
+    user: { data: currentUser },
+  } = useSelector((state) => state.cart);
+  const dispatch = useDispatch();
+
+  // const [cart, setCart] = useRecoilState(cartListState);
+  // const [errorMsg, setErrorMsg] = useRecoilState(errorMsgState);
+  // const currentUser = useRecoilValue(currentUserState);
 
   const history = useHistory();
 
   const addToCart = async (type) => {
     if (!currentUser)
       return (
-        setErrorMsg("You need to login first"),
-        setTimeout(() => setErrorMsg(null), 2000)
+        dispatch(ErrorMsgRedux.actions.setErrorMsg("You need to login first")),
+        setTimeout(() => ErrorMsgRedux.actions.resetErrorMsg(), 2000)
       );
 
     if (type === "buy") setBuyNowLoading(true);
     else setAddToCartLoading(true);
 
-    await API.addToCart({ productId: product._id, quantity: 1 });
-    const cart = await API.getCart();
-    cart.status && setCart(cart.data);
+    // await API.addToCart({ productId: product._id, quantity: 1 });
+    // const cart = await API.getCart();
+    // cart.status && setCart(cart.data);
+
+    dispatch(CartRedux.actions.addToCartSuccess())
 
     setAddToCartLoading(false);
     setBuyNowLoading(false);

@@ -1,40 +1,28 @@
 import React, { useState, useEffect } from "react";
-import "../styles/home.css";
-import "antd/dist/antd.css";
 import { Button, Alert } from "antd";
-import { useRecoilState, useResetRecoilState } from "recoil";
-import { errorMsgState, categoryListState } from "../recoil/atoms";
-
+import { useSelector, useDispatch } from "react-redux";
+import { Link } from "react-router-dom";
+import CategoriesRedux from "../redux/reducers/categories.reducer";
 import TopHeader from "../components/topHeader";
 import Body from "../components/home/body";
 import Loader from "../components/loader";
 import LoginSignupModal from "../components/loginSignupModal";
 
-import API from "../services/api";
-import { Link } from "react-router-dom";
-
 function Home() {
-  const [isLoading, setIsLoading] = useState(true);
   const [isLoginModalVisible, setIsLoginModalVisible] = useState(false);
-  const [errorMsg, setErrorMsg] = useRecoilState(errorMsgState);
-  const [categories, setCategories] = useRecoilState(categoryListState);
-  const resetCategories = useResetRecoilState(categoryListState);
+  const dispatch = useDispatch();
+
+  const { data: categories, loading: isLoading, error: errorMsg } = useSelector(
+    (state) => state.categories
+  );
 
   useEffect(() => {
-    fetchCategories();
+    if (categories)
+      if (!categories.length)
+        dispatch(CategoriesRedux.actions.fetchCategoriesRequest());
 
-    return () => resetCategories();
+    return () => dispatch(CategoriesRedux.actions.resetCategories());
   }, []);
-
-  const fetchCategories = async () => {
-    const response = await API.categories();
-    setIsLoading(false);
-    if (response.status) setCategories([...response.data]);
-    else {
-      setErrorMsg(response.message);
-      setTimeout(() => setErrorMsg(null), 2000);
-    }
-  };
 
   return (
     <div>
@@ -58,6 +46,8 @@ function Home() {
             </Button>
           </Link>
         </div>
+        {console.log({ categories })}
+
         <Body categories={categories} />
       </div>
       <div style={{ position: "absolute", zIndex: 10 }}>
@@ -70,13 +60,7 @@ function Home() {
       </div>
       {errorMsg && (
         <div id="alert">
-          <Alert
-            message="Error"
-            description={errorMsg}
-            type="error"
-            closable
-            onClose={() => setErrorMsg(null)}
-          />
+          <Alert message="Error" description={errorMsg} type="error" closable />
         </div>
       )}
     </div>

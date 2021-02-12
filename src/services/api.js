@@ -48,56 +48,18 @@ func.login = async (payload) => {
   }
 };
 
-func.profile = async () => {
-  try {
-    const res = await api.get("/profile");
-    return res.data;
-  } catch (error) {
-    return parseError(error);
-  }
-};
+func.profile = () => api.get("/profile");
+func.categories = () => api.get("/categories");
+func.getCart = () => api.get("/cart");
+func.products = (params) => api.get("/products", { params });
+func.addToCart = (payload) =>
+  api.post("/cart", { ...payload, quantity: payload.quantity || 1 });
 
-func.products = async (params) => {
-  try {
-    const res = await api.get("/products", { params });
-    return res.data;
-  } catch (error) {
-    return parseError(error);
-  }
-};
-
-func.categories = async () => {
-  try {
-    const res = await api.get("/categories");
-    return res.data;
-  } catch (error) {
-    return parseError(error);
-  }
-};
-
-func.addToCart = async (payload) => {
-  try {
-    payload.quantity = payload.quantity || 1;
-    const res = await api.post("/cart", payload);
-    return res.data;
-  } catch (error) {
-    return parseError(error);
-  }
-};
 
 func.removeFromCart = async (payload) => {
   try {
     payload.quantity = payload.quantity || 1;
     const res = await api.put("/cart", payload);
-    return res.data;
-  } catch (error) {
-    return parseError(error);
-  }
-};
-
-func.getCart = async () => {
-  try {
-    const res = await api.get("/cart");
     return res.data;
   } catch (error) {
     return parseError(error);

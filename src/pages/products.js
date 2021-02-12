@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from "react";
-import "../styles/product.css";
-import "antd/dist/antd.css";
 import TopHeader from "../components/topHeader";
 import Loader from "../components/loader";
 import { useLocation, useHistory } from "react-router-dom";
-import API from "../services/api";
-import { useRecoilState, useResetRecoilState } from "recoil";
-import { errorMsgState, productListState } from "../recoil/atoms";
+// import API from "../services/api";
+// import { useRecoilState, useResetRecoilState } from "recoil";
+// import { errorMsgState, productListState } from "../recoil/atoms";
 import Carousel, { Dots } from "@brainhubeu/react-carousel";
 import "@brainhubeu/react-carousel/lib/style.css";
 import LoginSignupModal from "../components/loginSignupModal";
@@ -14,6 +12,9 @@ import ProductModal from "../components/product/productModal";
 import ProductDesc from "../components/product/productDesc";
 import { Alert, Card, Menu, Dropdown, Button } from "antd";
 import { DownOutlined, LoadingOutlined } from "@ant-design/icons";
+import { useDispatch, useSelector } from "react-redux";
+import ProductsRedux from "../redux/reducers/products.reducer";
+
 const { Meta } = Card;
 
 function Products() {
@@ -21,8 +22,8 @@ function Products() {
   const [isLoginModalVisible, setIsLoginModalVisible] = useState(false);
   const [isProductModalVisible, setIsProductModalVisible] = useState(false);
   const [currentProduct, setCurrentProduct] = useState(null);
-  const [errorMsg, setErrorMsg] = useRecoilState(errorMsgState);
-  const [products, setProducts] = useRecoilState(productListState);
+  // const [errorMsg, setErrorMsg] = useRecoilState(errorMsgState);
+  // const [products, setProducts] = useRecoilState(productListState);
   const [values, setValues] = useState({});
   const [selectedSort, setSelectedSort] = useState(0);
   const sorts = {
@@ -30,25 +31,27 @@ function Products() {
     "p-lth": "Price Low to High",
     "p-htl": "Price High to Low",
   };
-  const resetProducts = useResetRecoilState(productListState);
+  // const resetProducts = useResetRecoilState(productListState);
 
   const location = useLocation();
-  const history = useHistory();
+  // const history = useHistory();
+
+  const dispatch = useDispatch();
+  const {
+    products: { data: products, error: errorMsg },
+  } = useSelector((state) => state);
 
   useEffect(() => {
     fetchProducts();
 
-    return () => resetProducts();
-  }, []);
+    return () => dispatch(ProductsRedux.actions.resetProducts());
+  }, [dispatch]);
 
   const fetchProducts = async (params = {}) => {
-    setIsLoading(true);
     const { pathname, search } = location;
     const temp = pathname.split("/");
     const categoryId = temp[temp.length - 1];
-
     temp.length > 2 && Object.assign(params, { categoryId });
-
     search
       .replace("?", "")
       .split("&")
@@ -57,18 +60,13 @@ function Products() {
         params[key] = value;
       });
 
-    const response = await API.products(params);
+    if (products)
+      if (!products.length || Object.keys(params).length)
+        dispatch(ProductsRedux.actions.fetchProducts(params));
 
-    setIsLoading(false);
-    if (response.status) {
-      setProducts([...response.data]);
-      const values = {};
-      response.data.forEach((e, i) => (values[i] = 0));
-      setValues({ ...values });
-    } else {
-      setErrorMsg(response.message);
-      setTimeout(() => setErrorMsg(null), 2000);
-    }
+    const values = {};
+    products.forEach((e, i) => (values[i] = 0));
+    setValues({ ...values });
   };
 
   const getSearch = () =>
@@ -238,7 +236,7 @@ function Products() {
             description={errorMsg}
             type="error"
             closable
-            onClose={() => setErrorMsg(null)}
+            // onClose={}
           />
         </div>
       )}

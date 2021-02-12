@@ -1,6 +1,4 @@
 import React, { useEffect, useState } from "react";
-import "antd/dist/antd.css";
-import "../styles/header.css";
 import { Layout, Input, Button, Badge, Tooltip } from "antd";
 import {
   ShopOutlined,
@@ -8,38 +6,33 @@ import {
   ShoppingCartOutlined,
   HistoryOutlined,
 } from "@ant-design/icons";
-import API from "../services/api";
-import { currentUserState, cartListState } from "../recoil/atoms";
-import { useRecoilState } from "recoil";
 import { Link, useLocation, useHistory } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import UserRedux from "../redux/reducers/user.reducer";
 
 const { Header } = Layout;
 const { Search } = Input;
 
 function TopHeader({ setIsLoginModalVisible }) {
-  const [currentUser, setCurrentUser] = useRecoilState(currentUserState);
-  const [cart, setCart] = useRecoilState(cartListState);
   const [logoutLoading, setLogoutLoading] = useState(false);
+  const dispatch = useDispatch();
+  const {
+    user: { data: currentUser },
+    cart: { data: cart },
+  } = useSelector((state) => state);
 
   const location = useLocation();
   const history = useHistory();
 
   useEffect(() => {
-    checkLogin();
-  }, []);
-
-  const checkLogin = async () => {
-    const response = await API.profile();
-    response.status && setCurrentUser({ ...response.data });
-    const cart = await API.getCart();
-    cart.status && setCart(cart.data);
-  };
+    dispatch(UserRedux.actions.fetchUserRequest());
+  }, [dispatch]);
 
   const logout = async () => {
     setLogoutLoading(true);
     localStorage.removeItem("token");
     setTimeout(() => {
-      setCurrentUser(null);
+      dispatch(UserRedux.actions.resetUser());
       setLogoutLoading(false);
       history.push("/");
     }, 1000);

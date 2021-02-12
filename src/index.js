@@ -1,20 +1,20 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import "./styles/index.css";
-import Home from "./pages/home";
-import Products from "./pages/products";
-import Cart from "./pages/cart";
-import Orders from "./pages/orders";
 import * as serviceWorker from "./serviceWorker";
-import "antd/dist/antd.css";
 import {
   BrowserRouter as Router,
   Switch,
   Route,
   useLocation,
 } from "react-router-dom";
-
-import { RecoilRoot } from "recoil";
+import { Provider } from "react-redux";
+import "antd/dist/antd.css";
+import "./styles";
+import Home from "./pages/home";
+import Products from "./pages/products";
+import Cart from "./pages/cart";
+import Orders from "./pages/orders";
+import store from "./redux/store";
 
 function NoMatch() {
   const location = useLocation();
@@ -29,7 +29,7 @@ function NoMatch() {
 }
 
 ReactDOM.render(
-  <RecoilRoot>
+  <Provider store={store}>
     <React.StrictMode>
       <Router basename="/shopping-cart">
         <Switch>
@@ -51,7 +51,7 @@ ReactDOM.render(
         </Switch>
       </Router>
     </React.StrictMode>
-  </RecoilRoot>,
+  </Provider>,
   document.getElementById("root")
 );
 

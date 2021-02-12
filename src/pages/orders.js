@@ -1,6 +1,4 @@
 import React, { useState, useEffect } from "react";
-import "../styles/home.css";
-import "antd/dist/antd.css";
 import { Modal, Alert, Collapse } from "antd";
 import { useRecoilState, useResetRecoilState } from "recoil";
 import { errorMsgState, orderListState } from "../recoil/atoms";
