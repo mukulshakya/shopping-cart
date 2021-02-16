@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { Button, Alert } from "antd";
 import { useSelector, useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
@@ -9,29 +9,23 @@ import Loader from "../components/loader";
 import LoginSignupModal from "../components/loginSignupModal";
 
 function Home() {
-  const [isLoginModalVisible, setIsLoginModalVisible] = useState(false);
   const dispatch = useDispatch();
 
-  const { data: categories, loading: isLoading, error: errorMsg } = useSelector(
-    (state) => state.categories
-  );
+  const {
+    categories: { data: categories, loading: isLoading },
+    error: { message: errorMsg },
+  } = useSelector((state) => state);
 
   useEffect(() => {
-    if (categories)
-      if (!categories.length)
-        dispatch(CategoriesRedux.actions.fetchCategoriesRequest());
+    dispatch(CategoriesRedux.actions.fetchCategoriesRequest());
 
     return () => dispatch(CategoriesRedux.actions.resetCategories());
-  }, []);
+  }, [dispatch]);
 
   return (
     <div>
       <Loader isLoading={isLoading} />
-      <TopHeader
-        setIsLoginModalVisible={() =>
-          setIsLoginModalVisible(!isLoginModalVisible)
-        }
-      />
+      <TopHeader />
       <div id="body">
         <div
           style={{
@@ -46,17 +40,10 @@ function Home() {
             </Button>
           </Link>
         </div>
-        {console.log({ categories })}
-
         <Body categories={categories} />
       </div>
       <div style={{ position: "absolute", zIndex: 10 }}>
-        <LoginSignupModal
-          isLoginModalVisible={isLoginModalVisible}
-          setIsLoginModalVisible={() =>
-            setIsLoginModalVisible(!isLoginModalVisible)
-          }
-        />
+        <LoginSignupModal />
       </div>
       {errorMsg && (
         <div id="alert">

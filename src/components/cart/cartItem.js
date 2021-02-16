@@ -1,30 +1,29 @@
-import React, { useState } from "react";
-import ProductDesc from "../product/productDesc";
-import Quantity from "../quantity";
+import React, { useState, useEffect } from "react";
 import { Button } from "antd";
 import { CloseOutlined } from "@ant-design/icons";
-import API from "../../services/api";
+import { connect, useSelector } from "react-redux";
+import ProductDesc from "../product/productDesc";
+import Quantity from "../quantity";
+import CartRedux from "../../redux/reducers/cart.reducer";
 
 function CartItem({
   item,
-  updateCart,
   setCurrentProduct,
   setIsProductModalVisible,
+  removeFromCart,
 }) {
   const [removeFromCartLoading, setRemoveFromCartLoading] = useState(false);
+
+  const isLoading = useSelector((state) => state.cart.loading);
 
   const deliveryDate = new Date();
   deliveryDate.setDate(deliveryDate.getDate() + 3);
 
-  const removeFromCart = async () => {
-    setRemoveFromCartLoading(true);
-    const response = await API.removeFromCart({
-      productId: item.productId,
-      quantity: item.quantity,
-    });
-    response.status && updateCart();
-    setRemoveFromCartLoading(false);
-  };
+  useEffect(() => {
+    removeFromCartLoading &&
+      removeFromCartLoading !== isLoading &&
+      setRemoveFromCartLoading(isLoading);
+  }, [isLoading]);
 
   return (
     <div
@@ -55,7 +54,6 @@ function CartItem({
           <Quantity
             quantity={item.quantity}
             stockCount={item.product.stockCount}
-            updateCart={updateCart}
             productId={item.productId}
           />
         </div>
@@ -84,7 +82,13 @@ function CartItem({
             icon={<CloseOutlined />}
             size="small"
             loading={removeFromCartLoading}
-            onClick={removeFromCart}
+            onClick={() => {
+              setRemoveFromCartLoading(true);
+              removeFromCart({
+                productId: item.productId,
+                quantity: item.quantity,
+              });
+            }}
           />
         </div>
       </div>
@@ -92,4 +96,11 @@ function CartItem({
   );
 }
 
-export default CartItem;
+const mapStateToProps = (state) => {
+  return {};
+};
+const mapDispatchToProps = {
+  removeFromCart: CartRedux.actions.removeFromCartRequest,
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(CartItem);

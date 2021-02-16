@@ -1,29 +1,21 @@
 import React, { useState, useEffect } from "react";
-import TopHeader from "../components/topHeader";
-import Loader from "../components/loader";
-import { useLocation, useHistory } from "react-router-dom";
-// import API from "../services/api";
-// import { useRecoilState, useResetRecoilState } from "recoil";
-// import { errorMsgState, productListState } from "../recoil/atoms";
+import { useLocation } from "react-router-dom";
 import Carousel, { Dots } from "@brainhubeu/react-carousel";
-import "@brainhubeu/react-carousel/lib/style.css";
-import LoginSignupModal from "../components/loginSignupModal";
-import ProductModal from "../components/product/productModal";
-import ProductDesc from "../components/product/productDesc";
 import { Alert, Card, Menu, Dropdown, Button } from "antd";
 import { DownOutlined, LoadingOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
+import TopHeader from "../components/topHeader";
+import Loader from "../components/loader";
+import LoginSignupModal from "../components/loginSignupModal";
+import ProductModal from "../components/product/productModal";
+import ProductDesc from "../components/product/productDesc";
 import ProductsRedux from "../redux/reducers/products.reducer";
 
 const { Meta } = Card;
 
 function Products() {
-  const [isLoading, setIsLoading] = useState(true);
-  const [isLoginModalVisible, setIsLoginModalVisible] = useState(false);
   const [isProductModalVisible, setIsProductModalVisible] = useState(false);
   const [currentProduct, setCurrentProduct] = useState(null);
-  // const [errorMsg, setErrorMsg] = useRecoilState(errorMsgState);
-  // const [products, setProducts] = useRecoilState(productListState);
   const [values, setValues] = useState({});
   const [selectedSort, setSelectedSort] = useState(0);
   const sorts = {
@@ -31,21 +23,26 @@ function Products() {
     "p-lth": "Price Low to High",
     "p-htl": "Price High to Low",
   };
-  // const resetProducts = useResetRecoilState(productListState);
 
   const location = useLocation();
-  // const history = useHistory();
 
   const dispatch = useDispatch();
   const {
-    products: { data: products, error: errorMsg },
+    products: { data: products, loading: isLoading },
+    error: { message: errorMsg },
   } = useSelector((state) => state);
 
   useEffect(() => {
     fetchProducts();
 
     return () => dispatch(ProductsRedux.actions.resetProducts());
-  }, [dispatch]);
+  }, []);
+
+  useEffect(() => {
+    const values = {};
+    products.forEach((e, i) => (values[i] = 0));
+    setValues({ ...values });
+  }, [products]);
 
   const fetchProducts = async (params = {}) => {
     const { pathname, search } = location;
@@ -62,11 +59,7 @@ function Products() {
 
     if (products)
       if (!products.length || Object.keys(params).length)
-        dispatch(ProductsRedux.actions.fetchProducts(params));
-
-    const values = {};
-    products.forEach((e, i) => (values[i] = 0));
-    setValues({ ...values });
+        dispatch(ProductsRedux.actions.fetchProductsRequest(params));
   };
 
   const getSearch = () =>
@@ -86,11 +79,7 @@ function Products() {
   return (
     <div>
       <Loader isLoading={isLoading} />
-      <TopHeader
-        setIsLoginModalVisible={() =>
-          setIsLoginModalVisible(!isLoginModalVisible)
-        }
-      />
+      <TopHeader />
       <div id="body">
         <div
           style={{
@@ -134,7 +123,12 @@ function Products() {
                 {Object.entries(sorts).map(([key, value], index) => (
                   <Menu.Item key={index} value={key}>
                     <span
-                      style={{ color: index == selectedSort ? "red" : "black" }}
+                      style={{
+                        color:
+                          parseInt(index) === parseInt(selectedSort)
+                            ? "red"
+                            : "black",
+                      }}
                     >
                       {value}
                     </span>
@@ -215,12 +209,7 @@ function Products() {
       </div>
 
       <div style={{ position: "absolute", zIndex: 10 }}>
-        <LoginSignupModal
-          isLoginModalVisible={isLoginModalVisible}
-          setIsLoginModalVisible={() =>
-            setIsLoginModalVisible(!isLoginModalVisible)
-          }
-        />
+        <LoginSignupModal />
         <ProductModal
           product={currentProduct}
           isProductModalVisible={isProductModalVisible}
@@ -231,13 +220,7 @@ function Products() {
       </div>
       {errorMsg && (
         <div id="alert">
-          <Alert
-            message="Error"
-            description={errorMsg}
-            type="error"
-            closable
-            // onClose={}
-          />
+          <Alert message="Error" description={errorMsg} type="error" closable />
         </div>
       )}
     </div>

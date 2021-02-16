@@ -5,3 +5,4 @@ import "./loader.css";
 import "./main.css";
 import "./product.css";
 import "./zoomingImage.css";
+import "@brainhubeu/react-carousel/lib/style.css";

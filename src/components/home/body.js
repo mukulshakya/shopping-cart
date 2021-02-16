@@ -1,8 +1,6 @@
 import React from "react";
-import "antd/dist/antd.css";
-import ZoomingImage from "../zoomingImage";
-import "../../styles/body.css";
 import { Link } from "react-router-dom";
+import ZoomingImage from "../zoomingImage";
 
 function Body({ categories }) {
   return (

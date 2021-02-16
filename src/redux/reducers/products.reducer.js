@@ -3,12 +3,12 @@ import storeInitialState from "../store/initialState";
 
 export const INITIAL_STATE = storeInitialState.products;
 
-export const fetchProductsFailure = (state) => {
-  state.loading = false;
-};
-
 export const fetchProductsRequest = (state) => {
   state.loading = true;
+};
+
+export const fetchProductsFailure = (state) => {
+  state.loading = false;
 };
 
 export const fetchProductsSuccess = (state, action) => {
@@ -18,15 +18,14 @@ export const fetchProductsSuccess = (state, action) => {
 
 export const resetProducts = (state) => {
   state.data = [];
-  state.error = null;
 };
 
 export default createSlice({
   name: "products",
   initialState: INITIAL_STATE,
   reducers: {
-    fetchProductsFailure,
     fetchProductsRequest,
+    fetchProductsFailure,
     fetchProductsSuccess,
     resetProducts,
   },

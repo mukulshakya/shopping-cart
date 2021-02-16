@@ -1,29 +1,27 @@
 import React, { useState, useEffect } from "react";
 import { Modal, Alert, Collapse } from "antd";
-import { useRecoilState, useResetRecoilState } from "recoil";
-import { errorMsgState, orderListState } from "../recoil/atoms";
+import { CheckCircleTwoTone, HomeOutlined } from "@ant-design/icons";
+import { useHistory } from "react-router-dom";
+import { connect, useSelector } from "react-redux";
 import ProductModal from "../components/product/productModal";
-
 import TopHeader from "../components/topHeader";
 import Loader from "../components/loader";
 import LoginSignupModal from "../components/loginSignupModal";
-import { CheckCircleTwoTone, HomeOutlined } from "@ant-design/icons";
+import OrdersRedux from "../redux/reducers/orders.reducer";
 
-import { useHistory } from "react-router-dom";
-
-import API from "../services/api";
 const { Panel } = Collapse;
-function Cart() {
-  const [isLoading, setIsLoading] = useState(true);
-  const [isLoginModalVisible, setIsLoginModalVisible] = useState(false);
+
+function Orders({ fetchOrders, resetOrders }) {
   const [isSuccessModalVisible, setIsSuccessModalVisible] = useState(false);
   const [isProductModalVisible, setIsProductModalVisible] = useState(false);
   const [currentProduct, setCurrentProduct] = useState(null);
-  const [errorMsg, setErrorMsg] = useRecoilState(errorMsgState);
-  const [orders, setOrders] = useRecoilState(orderListState);
-  const resetOrders = useResetRecoilState(orderListState);
 
   const history = useHistory();
+
+  const {
+    orders: { data: orders, loading: isLoading },
+    error: { message: errorMsg },
+  } = useSelector((state) => state);
 
   const deliveryDate = new Date();
   deliveryDate.setDate(deliveryDate.getDate() + 3);
@@ -32,18 +30,7 @@ function Cart() {
     fetchOrders();
 
     return () => resetOrders();
-  }, []);
-
-  const fetchOrders = async () => {
-    setIsLoading(true);
-    const response = await API.getMyOrders();
-    setIsLoading(false);
-    if (response.status) setOrders([...response.data]);
-    else {
-      setErrorMsg(response.message);
-      setTimeout(() => setErrorMsg(null), 2000);
-    }
-  };
+  }, [fetchOrders, resetOrders]);
 
   const calcDeliveryDate = (order) => {
     const deliveryDate = new Date(order.createdAt);
@@ -63,11 +50,7 @@ function Cart() {
   return (
     <div>
       <Loader isLoading={isLoading} />
-      <TopHeader
-        setIsLoginModalVisible={() =>
-          setIsLoginModalVisible(!isLoginModalVisible)
-        }
-      />
+      <TopHeader />
       <div style={{ margin: "10px 20%" }}>
         <h2>My Orders</h2>
         <Collapse>
@@ -147,12 +130,7 @@ function Cart() {
       </Modal>
 
       <div style={{ position: "absolute", zIndex: 10 }}>
-        <LoginSignupModal
-          isLoginModalVisible={isLoginModalVisible}
-          setIsLoginModalVisible={() =>
-            setIsLoginModalVisible(!isLoginModalVisible)
-          }
-        />
+        <LoginSignupModal />
         <ProductModal
           product={currentProduct}
           isProductModalVisible={isProductModalVisible}
@@ -164,17 +142,19 @@ function Cart() {
 
       {errorMsg && (
         <div id="alert">
-          <Alert
-            message="Error"
-            description={errorMsg}
-            type="error"
-            closable
-            onClose={() => setErrorMsg(null)}
-          />
+          <Alert message="Error" description={errorMsg} type="error" closable />
         </div>
       )}
     </div>
   );
 }
 
-export default Cart;
+const mapStateToProps = (state) => {
+  return {};
+};
+const mapDispatchToProps = {
+  fetchOrders: OrdersRedux.actions.fetchOrdersRequest,
+  resetOrders: OrdersRedux.actions.resetOrders,
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Orders);

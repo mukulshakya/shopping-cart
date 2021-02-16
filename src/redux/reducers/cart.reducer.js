@@ -3,13 +3,12 @@ import storeInitialState from "../store/initialState";
 
 export const INITIAL_STATE = storeInitialState.cart;
 
-export const fetchCartFailure = (state, action) => {
-  state.loading = false;
-  state.error = action.payload;
-};
-
 export const fetchCartRequest = (state) => {
   state.loading = true;
+};
+
+export const fetchCartFailure = (state, action) => {
+  state.loading = false;
 };
 
 export const fetchCartSuccess = (state, action) => {
@@ -17,28 +16,62 @@ export const fetchCartSuccess = (state, action) => {
   state.loading = false;
 };
 
-export const resetCart = (state) => {
-  state.data = [];
-  state.error = null;
+export const addToCartRequest = (state) => {
+  state.loading = true;
 };
 
 export const addToCartFailure = (state) => {
   state.loading = false;
 };
 
-export const addToCartRequest = (state) => {
+export const addToCartSuccess = (state, action) => {
+  state.loading = false;
+};
+
+export const removeFromCartRequest = (state) => {
   state.loading = true;
+};
+
+export const removeFromCartFailure = (state) => {
+  state.loading = false;
+};
+
+export const removeFromCartSuccess = (state) => {
+  state.loading = false;
+};
+
+export const updateCartRequest = (state) => {
+  state.loading = true;
+};
+
+export const updateCartFailure = (state, action) => {
+  state.loading = false;
+};
+
+export const updateCartSuccess = (state, action) => {
+  state.loading = false;
+};
+
+export const resetCart = (state) => {
+  state.data = [];
 };
 
 export default createSlice({
   name: "cart",
   initialState: INITIAL_STATE,
   reducers: {
-    fetchCartFailure,
     fetchCartRequest,
+    fetchCartFailure,
     fetchCartSuccess,
-    resetCart,
+    addToCartRequest,
     addToCartFailure,
-    addToCartRequest
+    addToCartSuccess,
+    removeFromCartRequest,
+    removeFromCartFailure,
+    removeFromCartSuccess,
+    updateCartRequest,
+    updateCartFailure,
+    updateCartSuccess,
+    resetCart,
   },
 });

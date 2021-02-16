@@ -1,11 +1,11 @@
 const storeInitialState = {
-  isLoggedin: true,
-  errorMsg: null,
-  user: { data: null, loading: true, error: null },
-  products: { data: [], loading: true, error: null },
-  cart: { data: [], loading: true, error: null },
-  orders: { data: [], loading: true, error: null },
-  categories: { data: [], loading: true, error: null },
+  loginModal: { isVisible: false },
+  error: { message: null },
+  user: { data: null, loading: false },
+  products: { data: [], loading: true },
+  cart: { data: [], loading: false },
+  orders: { data: [], loading: true },
+  categories: { data: [], loading: true },
 };
 
 export default storeInitialState;

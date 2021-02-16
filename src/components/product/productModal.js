@@ -1,57 +1,48 @@
-import React, { useState } from "react";
-// import API from "../../services/api";
-// import { useRecoilState, useRecoilValue } from "recoil";
-// import {
-//   errorMsgState,
-//   cartListState,
-//   currentUserState,
-// } from "../../recoil/atoms";
+import React, { useState,useEffect } from "react";
 import Carousel, { Dots } from "@brainhubeu/react-carousel";
-import "@brainhubeu/react-carousel/lib/style.css";
-import ProductDesc from "./productDesc";
 import { Link, useHistory } from "react-router-dom";
 import { Modal, Button } from "antd";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector, connect } from "react-redux";
+import ProductDesc from "./productDesc";
 import ErrorMsgRedux from "../../redux/reducers/errorMsg.reducer";
-import CartRedux from "../../redux/reducers/cart.reducer"
-
+import CartRedux from "../../redux/reducers/cart.reducer";
 
 function ProductModal({
   product,
   isProductModalVisible,
   setIsProductModalVisible,
+  addToCartRequest,
+  setErrorMsg,
+  resetErrorMsg,
 }) {
   const [value, setValue] = useState(0);
   const [addToCartLoading, setAddToCartLoading] = useState(false);
   const [buyNowLoading, setBuyNowLoading] = useState(false);
+  const [currentType, setCurrentType] = useState(null);
 
   const {
     cart: { data: cart },
     user: { data: currentUser },
-  } = useSelector((state) => state.cart);
-  const dispatch = useDispatch();
+  } = useSelector((state) => state);
 
-  // const [cart, setCart] = useRecoilState(cartListState);
-  // const [errorMsg, setErrorMsg] = useRecoilState(errorMsgState);
-  // const currentUser = useRecoilValue(currentUserState);
+  useEffect(() => {
+    if (currentType === "buy") setBuyNowLoading(true);
+    else if (currentType === "cart") setAddToCartLoading(true);
+  }, [currentType]);
 
   const history = useHistory();
 
   const addToCart = async (type) => {
     if (!currentUser)
       return (
-        dispatch(ErrorMsgRedux.actions.setErrorMsg("You need to login first")),
-        setTimeout(() => ErrorMsgRedux.actions.resetErrorMsg(), 2000)
+        setErrorMsg("You need to login first"),
+        setTimeout(() => resetErrorMsg(), 2000)
       );
 
-    if (type === "buy") setBuyNowLoading(true);
-    else setAddToCartLoading(true);
+    if (type === "buy") setCurrentType("buy");
+    else setCurrentType("cart");
 
-    // await API.addToCart({ productId: product._id, quantity: 1 });
-    // const cart = await API.getCart();
-    // cart.status && setCart(cart.data);
-
-    dispatch(CartRedux.actions.addToCartSuccess())
+    addToCartRequest({ productId: product._id, quantity: 1 });
 
     setAddToCartLoading(false);
     setBuyNowLoading(false);
@@ -140,11 +131,7 @@ function ProductModal({
               >
                 {isOnCart() ? (
                   <Link to="/cart">
-                    <Button
-                      type="primary"
-                      loading={addToCartLoading}
-                      // onClick={addToCart}
-                    >
+                    <Button type="primary" onClick={() => true}>
                       GO TO CART
                     </Button>
                   </Link>
@@ -174,4 +161,13 @@ function ProductModal({
   );
 }
 
-export default ProductModal;
+const mapStateToProps = (state) => {
+  return {};
+};
+const mapDispatchToProps = {
+  addToCartRequest: CartRedux.actions.addToCartRequest,
+  setErrorMsg: ErrorMsgRedux.actions.setErrorMsg,
+  resetErrorMsg: ErrorMsgRedux.actions.resetErrorMsg,
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(ProductModal);

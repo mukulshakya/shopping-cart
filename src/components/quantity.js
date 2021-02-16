@@ -1,42 +1,49 @@
-import React, { useState } from "react";
-import { errorMsgState } from "../recoil/atoms";
+import React, { useState, useEffect } from "react";
 import { Button } from "antd";
 import { PlusOutlined, MinusOutlined } from "@ant-design/icons";
-import API from "../services/api";
+import { connect, useSelector } from "react-redux";
+import CartRedux from "../redux/reducers/cart.reducer";
+import ErrorMsgRedux from "../redux/reducers/errorMsg.reducer";
 
-function Quantity({ quantity, stockCount, updateCart, productId }) {
+function Quantity({
+  quantity,
+  stockCount,
+  productId,
+  setErrorMsg,
+  addToCart,
+  removeFromCart,
+}) {
   const [value, setValue] = useState(quantity || 1);
-  const [errMsg, setErrMsg] = useState(errorMsgState);
   const [incLoading, setIncLoading] = useState(false);
   const [decLoading, setDecLoading] = useState(false);
+  const [currentType, setCurrentType] = useState(null);
+
+  const {
+    cart: { loading: isLoading },
+  } = useSelector((state) => state);
 
   const increment = async () => {
-    setIncLoading(true);
+    setCurrentType("inc");
     const updated = stockCount > 0 ? value + 1 : false;
-    if (updated) {
-      await API.addToCart({ productId, quantity: 1 });
-      await updateCart();
-      setValue(updated);
-    } else {
-      setErrMsg("Out of stock");
-      setTimeout(() => setErrMsg(null), 2000);
-    }
-    setIncLoading(false);
+    if (updated) addToCart({ productId, quantity: 1 });
+    else setErrorMsg("Out of stock");
   };
 
   const decrement = async () => {
-    setDecLoading(true);
+    setCurrentType("dec");
     const updated = value > 1 ? value - 1 : false;
-    if (updated) {
-      await API.removeFromCart({ productId, quantity: 1 });
-      await updateCart();
-      setValue(updated);
-    } else {
-      setErrMsg("Out of stock");
-      setTimeout(() => setErrMsg(null), 2000);
-    }
-    setDecLoading(false);
+    if (updated) removeFromCart({ productId, quantity: 1 });
+    else setErrorMsg("Out of stock");
   };
+
+  useEffect(() => {
+    setValue(quantity);
+  }, [quantity]);
+
+  useEffect(() => {
+    if (currentType === "inc") setIncLoading(isLoading);
+    else if (currentType === "dec") setDecLoading(isLoading);
+  }, [isLoading, currentType]);
 
   return (
     <div
@@ -64,4 +71,13 @@ function Quantity({ quantity, stockCount, updateCart, productId }) {
   );
 }
 
-export default Quantity;
+const mapStateToProps = (state) => {
+  return {};
+};
+const mapDispatchToProps = {
+  addToCart: CartRedux.actions.addToCartRequest,
+  removeFromCart: CartRedux.actions.removeFromCartRequest,
+  setErrorMsg: ErrorMsgRedux.actions.setErrorMsg,
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Quantity);

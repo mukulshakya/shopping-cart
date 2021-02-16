@@ -1,5 +1,6 @@
-import { call, takeLatest, put } from "redux-saga/effects";
+import { call, takeLatest, put, all } from "redux-saga/effects";
 import ProductsRedux from "../reducers/products.reducer";
+import ErrorMsgRedux from "../reducers/errorMsg.reducer";
 import { parseError } from "../../services/utils";
 import API from "../../services/api";
 
@@ -12,6 +13,10 @@ export function* fetchProducts(action) {
     const response = yield call(API.products, action.payload);
     yield put(ProductsRedux.actions.fetchProductsSuccess(response.data.data));
   } catch (error) {
-    yield put(ProductsRedux.actions.fetchProductsFailure(parseError(error)));
+    const errorMsg = parseError(error);
+    yield all([
+      put(ProductsRedux.actions.fetchProductsFailure(errorMsg)),
+      put(ErrorMsgRedux.actions.setErrorMsg(errorMsg)),
+    ]);
   }
 }

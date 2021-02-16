@@ -7,15 +7,15 @@ import {
   HistoryOutlined,
 } from "@ant-design/icons";
 import { Link, useLocation, useHistory } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector, connect } from "react-redux";
 import UserRedux from "../redux/reducers/user.reducer";
+import LoginModalRedux from "../redux/reducers/loginModal.reducer";
 
 const { Header } = Layout;
 const { Search } = Input;
 
-function TopHeader({ setIsLoginModalVisible }) {
+function TopHeader({ fetchUser, resetUser, setLoginModalVisible }) {
   const [logoutLoading, setLogoutLoading] = useState(false);
-  const dispatch = useDispatch();
   const {
     user: { data: currentUser },
     cart: { data: cart },
@@ -25,14 +25,14 @@ function TopHeader({ setIsLoginModalVisible }) {
   const history = useHistory();
 
   useEffect(() => {
-    dispatch(UserRedux.actions.fetchUserRequest());
-  }, [dispatch]);
+    localStorage.getItem("token") && fetchUser();
+  }, [fetchUser]);
 
   const logout = async () => {
     setLogoutLoading(true);
     localStorage.removeItem("token");
     setTimeout(() => {
-      dispatch(UserRedux.actions.resetUser());
+      resetUser();
       setLogoutLoading(false);
       history.push("/");
     }, 1000);
@@ -89,7 +89,7 @@ function TopHeader({ setIsLoginModalVisible }) {
           </Button>
         </Tooltip>
       ) : (
-        <Button icon={<UserOutlined />} onClick={setIsLoginModalVisible}>
+        <Button icon={<UserOutlined />} onClick={setLoginModalVisible}>
           LOGIN / SIGNUP
         </Button>
       )}
@@ -97,4 +97,13 @@ function TopHeader({ setIsLoginModalVisible }) {
   );
 }
 
-export default TopHeader;
+const mapStateToProps = (state) => {
+  return {};
+};
+const mapDispatchToProps = {
+  fetchUser: UserRedux.actions.fetchUserRequest,
+  resetUser: UserRedux.actions.resetUser,
+  setLoginModalVisible: LoginModalRedux.actions.setLoginModalVisible,
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(TopHeader);

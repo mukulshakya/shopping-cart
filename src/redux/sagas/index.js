@@ -3,6 +3,7 @@ import { watchProductsRequests } from "./products.sagas";
 import { watchCategoriesRequests } from "./categories.sagas";
 import { watchUserRequests } from "./user.sagas";
 import { watchCartRequests } from "./cart.sagas";
+import { watchOrdersRequests } from "./orders.sagas";
 
 export default function* rootSaga() {
   yield all([
@@ -10,5 +11,6 @@ export default function* rootSaga() {
     watchUserRequests(),
     watchCartRequests(),
     watchProductsRequests(),
+    watchOrdersRequests(),
   ]);
 }

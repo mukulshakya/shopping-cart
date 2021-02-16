@@ -1,49 +1,19 @@
 import React, { useState } from "react";
-import "../styles/loader.css";
-import API from "../services/api";
-import { useRecoilState } from "recoil";
-import {
-  currentUserState,
-  errorMsgState,
-  cartListState,
-} from "../recoil/atoms";
 import { LoadingOutlined } from "@ant-design/icons";
-import {
-  Modal,
-  Button,
-  Tabs,
-  Form,
-  Input,
-} from "antd";
+import { Modal, Button, Tabs, Form, Input } from "antd";
+import { useSelector, connect } from "react-redux";
+import UserRedux from "../redux/reducers/user.reducer";
+import LoginModalRedux from "../redux/reducers/loginModal.reducer";
+
 const { TabPane } = Tabs;
 
 const layout = { labelCol: { span: 8 }, wrapperCol: { span: 16 } };
 const tailLayout = { wrapperCol: { offset: 8, span: 16 } };
 
-function LoginForm({ currentTab, setIsLoginModalVisible }) {
-  const [errorMsg, setErrorMsg] = useRecoilState(errorMsgState);
-  const [currentUser, setCurrentUser] = useRecoilState(currentUserState);
-  const [isLoading, setIsLoading] = useState(false);
-  const [cart, setCart] = useRecoilState(cartListState);
-
+function LoginForm({ currentTab, registerUser, loginUser, isLoading }) {
   const onFinish = async (values) => {
-    setIsLoading(true);
-    let response = {};
-    if (currentTab == 2) response = await API.register(values);
-    else response = await API.login(values);
-
-    if (response.status) {
-      localStorage.setItem("token", response.data.token);
-      setCurrentUser({ ...response.data.user });
-      setIsLoginModalVisible();
-
-      const cart = await API.getCart();
-      cart.status && setCart(cart.data);
-    } else {
-      setErrorMsg(response.message);
-      setTimeout(() => setErrorMsg(null), 2000);
-    }
-    setIsLoading(false);
+    if (parseInt(currentTab) === 2) registerUser({ ...values });
+    else loginUser({ ...values });
   };
 
   return (
@@ -94,24 +64,30 @@ function LoginForm({ currentTab, setIsLoginModalVisible }) {
   );
 }
 
-function LoginSignupModal({ isLoginModalVisible, setIsLoginModalVisible }) {
+function LoginSignupModal({ registerUser, loginUser, setLoginModalVisible }) {
   const [currentTab, setCurrentTab] = useState(1);
+  const {
+    user: { loading: isLoading },
+    loginModal: { isVisible },
+  } = useSelector((state) => state);
 
   return (
     <div id="wrapper">
       <Modal
         centered
-        visible={isLoginModalVisible}
-        onOk={setIsLoginModalVisible}
-        onCancel={setIsLoginModalVisible}
+        visible={isVisible}
+        onOk={setLoginModalVisible}
+        onCancel={setLoginModalVisible}
         footer={null}
       >
         <Tabs defaultActiveKey="1" onChange={(key) => setCurrentTab(key)}>
-          {["Login", "Sign Up", "Admin Login"].map((name, index) => (
+          {["Login", "Sign Up"].map((name, index) => (
             <TabPane tab={name} key={index + 1}>
               <LoginForm
                 currentTab={currentTab}
-                setIsLoginModalVisible={setIsLoginModalVisible}
+                registerUser={registerUser}
+                loginUser={loginUser}
+                isLoading={isLoading}
               />
             </TabPane>
           ))}
@@ -121,4 +97,13 @@ function LoginSignupModal({ isLoginModalVisible, setIsLoginModalVisible }) {
   );
 }
 
-export default LoginSignupModal;
+const mapStateToProps = (state) => {
+  return {};
+};
+const mapDispatchToProps = {
+  registerUser: UserRedux.actions.registerUserRequest,
+  loginUser: UserRedux.actions.loginUserRequest,
+  setLoginModalVisible: LoginModalRedux.actions.setLoginModalVisible,
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(LoginSignupModal);

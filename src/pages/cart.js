@@ -1,31 +1,28 @@
 import React, { useState, useEffect } from "react";
 import { Modal, Button, Alert } from "antd";
-import { useRecoilState, useResetRecoilState } from "recoil";
-import { errorMsgState, cartListState } from "../recoil/atoms";
+import { CheckCircleTwoTone } from "@ant-design/icons";
+import { connect, useSelector } from "react-redux";
+import { useHistory } from "react-router-dom";
 import ProductModal from "../components/product/productModal";
-
 import TopHeader from "../components/topHeader";
 import Loader from "../components/loader";
 import LoginSignupModal from "../components/loginSignupModal";
 import CartItem from "../components/cart/cartItem";
-import { CheckCircleTwoTone } from "@ant-design/icons";
+import CartRedux from "../redux/reducers/cart.reducer";
+import OrdersRedux from "../redux/reducers/orders.reducer";
 
-import { useHistory } from "react-router-dom";
-
-import API from "../services/api";
-
-function Cart() {
-  const [isLoading, setIsLoading] = useState(true);
-  const [isLoginModalVisible, setIsLoginModalVisible] = useState(false);
+function Cart({ fetchCart, resetCart, placeOrderRequest }) {
   const [isSuccessModalVisible, setIsSuccessModalVisible] = useState(false);
   const [placeOrderLoading, setPlaceOrderLoading] = useState(false);
   const [isProductModalVisible, setIsProductModalVisible] = useState(false);
   const [currentProduct, setCurrentProduct] = useState(null);
-  const [errorMsg, setErrorMsg] = useRecoilState(errorMsgState);
-  const [cart, setCart] = useRecoilState(cartListState);
-  const resetCart = useResetRecoilState(cartListState);
 
   const history = useHistory();
+
+  const {
+    cart: { data: cart, loading: isLoading },
+    error: { message: errorMsg },
+  } = useSelector((state) => state);
 
   const deliveryDate = new Date();
   deliveryDate.setDate(deliveryDate.getDate() + 3);
@@ -33,18 +30,7 @@ function Cart() {
   useEffect(() => {
     fetchCart();
     return () => resetCart();
-  }, []);
-
-  const fetchCart = async () => {
-    setIsLoading(true);
-    const response = await API.getCart();
-    setIsLoading(false);
-    if (response.status) setCart([...response.data]);
-    else {
-      setErrorMsg(response.message);
-      setTimeout(() => setErrorMsg(null), 2000);
-    }
-  };
+  }, [fetchCart, resetCart]);
 
   const placeOrder = async () => {
     setPlaceOrderLoading(true);
@@ -55,15 +41,12 @@ function Cart() {
       })),
     };
 
-    const response = await API.placeOrder({ ...payload });
-    setPlaceOrderLoading(false);
-    if (response.status) {
-      setIsSuccessModalVisible(true);
-      await fetchCart();
-    } else {
-      setErrorMsg(response.message);
-      setTimeout(() => setErrorMsg(null), 2000);
-    }
+    new Promise((resolve, reject) => {
+      console.log({ payload });
+      placeOrderRequest({ resolve, reject, payload });
+    })
+      .then(() => setIsSuccessModalVisible(true))
+      .finally(() => setPlaceOrderLoading(false));
   };
 
   const hideSuccessModal = () => {
@@ -92,11 +75,7 @@ function Cart() {
   return (
     <div>
       <Loader isLoading={isLoading} />
-      <TopHeader
-        setIsLoginModalVisible={() =>
-          setIsLoginModalVisible(!isLoginModalVisible)
-        }
-      />
+      <TopHeader />
       <div
         style={{
           margin: "10px 20%",
@@ -112,7 +91,6 @@ function Cart() {
           {cart.map((item) => (
             <CartItem
               item={item}
-              updateCart={fetchCart}
               setCurrentProduct={(product) => setCurrentProduct(product)}
               setIsProductModalVisible={() => setIsProductModalVisible(true)}
             />
@@ -198,12 +176,7 @@ function Cart() {
       {/* </div> */}
 
       <div style={{ position: "absolute", zIndex: 10 }}>
-        <LoginSignupModal
-          isLoginModalVisible={isLoginModalVisible}
-          setIsLoginModalVisible={() =>
-            setIsLoginModalVisible(!isLoginModalVisible)
-          }
-        />
+        <LoginSignupModal />
         <ProductModal
           product={currentProduct}
           isProductModalVisible={isProductModalVisible}
@@ -215,17 +188,20 @@ function Cart() {
 
       {errorMsg && (
         <div id="alert">
-          <Alert
-            message="Error"
-            description={errorMsg}
-            type="error"
-            closable
-            onClose={() => setErrorMsg(null)}
-          />
+          <Alert message="Error" description={errorMsg} type="error" closable />
         </div>
       )}
     </div>
   );
 }
 
-export default Cart;
+const mapStateToProps = (state) => {
+  return {};
+};
+const mapDispatchToProps = {
+  fetchCart: CartRedux.actions.fetchCartRequest,
+  resetCart: CartRedux.actions.resetCart,
+  placeOrderRequest: OrdersRedux.actions.placeOrderRequest,
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Cart);
