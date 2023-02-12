@@ -54,7 +54,9 @@ function TopHeader({ fetchUser, resetUser, setLoginModalVisible }) {
             ? "/shopping-cart"
             : "";
 
-          window.location = `${base}/products?search=${value}`;
+          window.location = location.pathname.startsWith(`${base}/products`)
+            ? `${location.pathname}?search=${value}`
+            : `${base}/products?search=${value}`;
         }}
         enterButton
       />
