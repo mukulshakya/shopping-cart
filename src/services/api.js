@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const url = {
-  LIVE: "https://heeko-ecommerce-api.herokuapp.com/v1",
+  LIVE: "https://dark-teal-squirrel-kit.cyclic.app/v1",
   LOCAL: "http://localhost:4040/v1",
 };
 // process.env.NODE_ENV === "production" ? URL.LIVE : URL.LOCAL
