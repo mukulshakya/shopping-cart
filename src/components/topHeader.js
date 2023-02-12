@@ -50,9 +50,11 @@ function TopHeader({ fetchUser, resetUser, setLoginModalVisible }) {
         style={{ width: "50%", "justify-content": "center", margin: "0 20px" }}
         placeholder="input search text"
         onSearch={(value) => {
-          window.location = location.pathname.startsWith("/shopping-cart")
-            ? `/shopping-cart/products?search=${value}`
-            : `/products?search=${value}`;
+          const base = location.pathname.startsWith("/shopping-cart")
+            ? "/shopping-cart"
+            : "";
+
+          window.location = `${base}/products?search=${value}`;
         }}
         enterButton
       />
