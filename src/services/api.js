@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const url = {
-  LIVE: "https://dark-teal-squirrel-kit.cyclic.app/v1",
+  LIVE: "https://shopping-cart-server-production-6923.up.railway.app/v1",
   LOCAL: "http://localhost:4040/v1",
 };
 // process.env.NODE_ENV === "production" ? URL.LIVE : URL.LOCAL
